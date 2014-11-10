@@ -42,25 +42,24 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         let coordiateRegion = MKCoordinateRegionMake(location.coordinate, MKCoordinateSpanMake(0.005, 0.005))
         
         mapView.setRegion(coordiateRegion, animated: false)
-        lookupSweepingForLocation(location)
+        lookupSweepingForLocation(location.coordinate)
         
         locationManager?.stopUpdatingHeading()
         locationManager?.stopUpdatingLocation()
         locationManager?.stopMonitoringSignificantLocationChanges()
     }
     
-    func lookupSweepingForLocation(location:CLLocation) {
-        let coordinate = location.coordinate
+    func lookupSweepingForLocation(coordinate:CLLocationCoordinate2D) {
         
-        let url = NSURL(string: "http://192.168.1.113:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)")
+        let url = NSURL(string: "https://obscure-journey-3692.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)")
+        
+//        let url = NSURL(string: "http://192.168.1.113:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)")
         
         var jsonError: NSError?
         
         let tap = UITapGestureRecognizer(target: self, action: Selector("handleOverlayTap:"))
         tap.delegate = self
         mapView.addGestureRecognizer(tap)
-
-//        let point:CGPoint = 
         
         let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
             if let results = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &jsonError) as? NSArray {
@@ -143,6 +142,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         }
         alert.addAction(destroyAction)
         self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
+        lookupSweepingForLocation(mapView.centerCoordinate)
     }
     
     func mapView(mapView: MKMapView!, rendererForOverlay overlay: MKOverlay!) -> MKOverlayRenderer! {
