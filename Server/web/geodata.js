@@ -1,7 +1,10 @@
 var dbUrl = process.env.MONGOLAB_URI || "sfstreets",
     coll = ["streets"],
-    db = require("mongojs").connect(dbUrl, coll);
-exports.nearby = function(lat, lon, callbackFn) {
+    db = require("mongojs").connect(dbUrl, coll),
+    moment = require('moment');
+exports.nearby = function(lat, lon, maxDistance, callbackFn) {
+    if (maxDistance > 1000) maxDistance = 1000;
+    console.log('Issuing query for ' + lat + ', ' + lon + ' at ' + maxDistance + 'm')
     db.streets.find({
         geometry: {
             $near: { 
@@ -10,7 +13,7 @@ exports.nearby = function(lat, lon, callbackFn) {
                     coordinates: [lon, lat]
                 },
                 $minDistance: 1,
-                $maxDistance: 250
+                $maxDistance: maxDistance
             }
         }
     },
@@ -20,15 +23,15 @@ exports.nearby = function(lat, lon, callbackFn) {
         var resultset = []
 
         for (var i = 0; i < res.length; i++) {
-            // console.log(docs[i].properties.STREETNAME)
-            // console.log(docs[i].properties.WEEKDAY)
             var sweep = res[i].properties;
+
+            // isSweepInNext24Hours(sweep)
 
             var sweepingDay = convertWeekdayStringToNumber(sweep.WEEKDAY);
             if( todayOfWeek == sweepingDay ||
                 addOneDayOfWeek(todayOfWeek) == sweepingDay ||
                 sweepingDay == 7) {
-
+                
                 var desc = sweep.LF_FADD + 
                     '-' + sweep.LF_TOADD +
                     ' ' + 
@@ -44,18 +47,54 @@ exports.nearby = function(lat, lon, callbackFn) {
                     ' on the ' +
                     sweep.BLOCKSIDE +
                     ' side';
-                    if(sweep.STREETNAME == 'FILLMORE ST') {
 
-                        console.log(desc)
-                        console.log(sweep)
-                        console.log('left ' + sweep.LF_FADD + ' ' + sweep.LF_TOADD)
-                        console.log('right ' + sweep.RT_FADD + ' ' + sweep.RT_TOADD)
-                    }
+
                 resultset.push({"description": desc, "datapoint": res[i]});
             }
         };
         callbackFn(resultset);
     });
+}
+
+function isSweepInNext24Hours(properties) {
+    var now = new Date(),
+        today = now.getDay(),
+        tomorrow = addOneDayOfWeek(today),
+        from = getHoursFromUnformattedDateString(properties.FROMHOUR),
+        to = getHoursFromUnformattedDateString(properties.TOHOUR),
+        sweepingDay = convertWeekdayStringToNumber(properties.WEEKDAY),
+        nowHour = now.getHours();
+    // console.log(moment([2010, 1, 14, 15, 25, 50, 125]).toString());
+
+
+    if(today == sweepingDay || tomorrow == sweepingDay) {
+            var thisMoment = moment();
+            var todayFromDate = moment([   now.getFullYear(),
+                                now.getMonth(),
+                                now.getDate(),
+                                from]);
+            var todayToDate = moment([   now.getFullYear(),
+                                now.getMonth(),
+                                now.getDate(),
+                                to]);
+
+        if(today == sweepingDay) {
+            var blah = todayToDate.diff(todayFromDate);
+            console.log(blah.toString())
+
+            console.log(thisMoment.toString() + ' ' + todayFromDate.toString() + ' ' + todayToDate.toString())
+        } else if (tomorrow == sweepingDay) {
+            todayFromDate.add('1', 'days');
+            todayToDate.add('1', 'days');
+
+        }
+        console.log('from ' + from + ' to ' + to + ' nowHour ' + nowHour)
+    }
+
+}
+
+function getHoursFromUnformattedDateString(dateString) {
+    return dateString.substring(0, dateString.search(':'));
 }
 
 function prettyPrintWeeksOfMonth(properties) {

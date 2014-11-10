@@ -7,7 +7,11 @@ app.get('/nearby/:lat/:lon', function(req, res) {
     console.log(req.method + ' request: ' + req.url);
     var lat = parseFloat(req.params.lat),
         lon = parseFloat(req.params.lon);
-    geodata.nearby(lat, lon, function(docs) {
+    if(req.query.maxDistance != null)
+        maxDistance = parseInt(req.query.maxDistance);
+    else
+    	maxDistance = 150;
+    geodata.nearby(lat, lon, maxDistance, function(docs) {
     	res.send(docs);
     });
 });

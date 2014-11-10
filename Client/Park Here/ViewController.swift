@@ -49,11 +49,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         locationManager?.stopMonitoringSignificantLocationChanges()
     }
     
-    func lookupSweepingForLocation(coordinate:CLLocationCoordinate2D) {
+    func lookupSweepingForLocation(coordinate:CLLocationCoordinate2D, maxDistance:Int) {
         
-        let url = NSURL(string: "https://obscure-journey-3692.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)")
+        let url = NSURL(string: "https://obscure-journey-3692.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
         
-//        let url = NSURL(string: "http://192.168.1.113:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)")
+//        let url = NSURL(string: "http://192.168.1.113:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
         
         var jsonError: NSError?
         
@@ -64,28 +64,44 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
             if let results = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &jsonError) as? NSArray {
                 for result in results {
+                    print("found a result with ")
+                    println(result.valueForKeyPath("description") as String)
                     let geometryType = result.valueForKeyPath("datapoint.geometry.type") as String
                     let coordinates = result.valueForKeyPath("datapoint.geometry.coordinates") as NSArray
+                    let id = result.valueForKeyPath("datapoint._id") as String
+                    
                     if geometryType == "LineString" {
+                        if let overlayCollection = self.mapView.overlays as? [PolylineWithAnnotations] {
+                            for overlay in overlayCollection {
+                                if id == (overlay as PolylineWithAnnotations).id {
+                                    return
+                                }
+                            }
+                        }
                         var linepath:[CLLocationCoordinate2D] = []
                         for cord in coordinates {
                             let c = CLLocationCoordinate2DMake(cord[1] as CLLocationDegrees, cord[0] as CLLocationDegrees)
                             linepath.append(c)
                         }
-//                        let polyline2 = (
                         let polyline = PolylineWithAnnotations(coordinates: &linepath, count: linepath.count)
                         polyline.annotation = result.valueForKeyPath("description") as String
+                        polyline.id = id
                         println(polyline.annotation)
                         dispatch_async(dispatch_get_main_queue()) {
                             self.mapView.addOverlay(polyline, level: MKOverlayLevel.AboveRoads)
                         }
                     }
-
+                    
                 }
             }
             
         }
         task.resume()
+
+    }
+    
+    func lookupSweepingForLocation(coordinate:CLLocationCoordinate2D) {
+        lookupSweepingForLocation(coordinate, maxDistance: 150)
     }
     
     func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -111,7 +127,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
             }
         }
         if messages != "" {
-            createAlert("Upcoming Parking Restrctions", message: messages)
+            createAlert("Upcoming Restrictions", message: messages)
         }
     }
     
@@ -144,8 +160,26 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         self.presentViewController(alert, animated: true, completion: nil)
     }
     
+    func findMaxDimensionsOfMap(mapView: MKMapView!) -> Int {
+        let span = mapView.region.span
+        let center = mapView.centerCoordinate
+        
+        let loc1 = CLLocation(latitude: center.latitude - span.latitudeDelta * 0.5, longitude: center.longitude)
+        let loc2 = CLLocation(latitude: center.latitude + span.latitudeDelta * 0.5, longitude: center.longitude)
+        
+        let metersInLatitude = loc1.distanceFromLocation(loc2)
+        
+        let loc3 = CLLocation(latitude: center.latitude, longitude: center.longitude - span.longitudeDelta * 0.5)
+        let loc4 = CLLocation(latitude: center.latitude, longitude: center.longitude + span.longitudeDelta * 0.5)
+        
+        let metersInLongitude = loc3.distanceFromLocation(loc4)
+        
+        return Int(max(metersInLatitude, metersInLongitude))
+    }
+    
     func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
-        lookupSweepingForLocation(mapView.centerCoordinate)
+        let maxDistance = findMaxDimensionsOfMap(mapView)
+        lookupSweepingForLocation(mapView.centerCoordinate, maxDistance: maxDistance)
     }
     
     func mapView(mapView: MKMapView!, rendererForOverlay overlay: MKOverlay!) -> MKOverlayRenderer! {
