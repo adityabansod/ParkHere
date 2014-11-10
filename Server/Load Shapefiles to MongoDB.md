@@ -36,4 +36,10 @@ and save that to `sweeping_clean.json`
 
 `mongoimport --db sfstreets --collection streets < sweeping_clean.json`
 
+# Create a 2dsphere spatial index
 
+Mongo needs an index to query on geospatial data. To create it from the `mongo` command line:
+
+`db.streets.ensureIndex({"geometry":"2dsphere"})`
+
+Where `streets` is your collection name and `geometry` is the object in your document that contains the GeoJSON location data.

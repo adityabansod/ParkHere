@@ -1,4 +1,4 @@
-var dbUrl = "sfstreets",
+var dbUrl = process.env.MONGOLAB_URI || "sfstreets",
     coll = ["streets"],
     db = require("mongojs").connect(dbUrl, coll);
 exports.nearby = function(lat, lon, callbackFn) {
@@ -10,7 +10,7 @@ exports.nearby = function(lat, lon, callbackFn) {
                     coordinates: [lon, lat]
                 },
                 $minDistance: 1,
-                $maxDistance: 1500
+                $maxDistance: 250
             }
         }
     },
