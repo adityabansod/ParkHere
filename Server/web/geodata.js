@@ -36,9 +36,7 @@ exports.nearby = function(lat, lon, maxDistance, callbackFn) {
                     '-' + sweep.LF_TOADD +
                     ' ' + 
                     sweep.STREETNAME +
-                    ' is swept ' +
-                    prettyPrintWeeksOfMonth(sweep) +
-                    ' on ' + 
+                    ' will be swept on ' +
                     sweep.WEEKDAY +
                     ' from ' +
                     sweep.FROMHOUR +
@@ -106,7 +104,7 @@ function prettyPrintWeeksOfMonth(properties) {
         week5 = properties.WEEK5OFMON;
 
     if (holidays && week1 && week2 && week3 && week4 && week5) {
-        return "every week including holidays";
+        return "every week";
     } else if (week1 && week2 && week3 && week4 && week5) {
         return "every week";
     } else if (week1) {

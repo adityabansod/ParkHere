@@ -51,9 +51,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     
     func lookupSweepingForLocation(coordinate:CLLocationCoordinate2D, maxDistance:Int) {
         
-        let url = NSURL(string: "https://obscure-journey-3692.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
+//        let url = NSURL(string: "https://obscure-journey-3692.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
         
-//        let url = NSURL(string: "http://192.168.1.113:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
+        let url = NSURL(string: "http://192.168.1.143:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
         
         var jsonError: NSError?
         
@@ -179,7 +179,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     
     func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
         let maxDistance = findMaxDimensionsOfMap(mapView)
-        lookupSweepingForLocation(mapView.centerCoordinate, maxDistance: maxDistance)
+        if(maxDistance < 1000) {
+            lookupSweepingForLocation(mapView.centerCoordinate, maxDistance: maxDistance)
+        }
     }
     
     func mapView(mapView: MKMapView!, rendererForOverlay overlay: MKOverlay!) -> MKOverlayRenderer! {
