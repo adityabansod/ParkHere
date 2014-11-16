@@ -51,9 +51,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     
     func lookupSweepingForLocation(coordinate:CLLocationCoordinate2D, maxDistance:Int) {
         
-//        let url = NSURL(string: "https://obscure-journey-3692.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
+        let url = NSURL(string: "https://obscure-journey-3692.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
         
-        let url = NSURL(string: "http://192.168.1.143:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
+//        let url = NSURL(string: "http://192.168.1.143:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
         
         var jsonError: NSError?
         
