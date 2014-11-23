@@ -51,9 +51,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     
     func lookupSweepingForLocation(coordinate:CLLocationCoordinate2D, maxDistance:Int) {
         
-        let url = NSURL(string: "https://obscure-journey-3692.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
+//        let url = NSURL(string: "https://obscure-journey-3692.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
         
-//        let url = NSURL(string: "http://192.168.1.143:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
+        let url = NSURL(string: "http://localhost:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
         
         var jsonError: NSError?
         
@@ -65,10 +65,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
             if let results = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &jsonError) as? NSArray {
                 for result in results {
                     print("found a result with ")
-                    println(result.valueForKeyPath("description") as String)
-                    let geometryType = result.valueForKeyPath("datapoint.geometry.type") as String
-                    let coordinates = result.valueForKeyPath("datapoint.geometry.coordinates") as NSArray
-                    let id = result.valueForKeyPath("datapoint._id") as String
+                    println(result.valueForKeyPath("properties.Regulation") as String)
+                    let geometryType = result.valueForKeyPath("geometry.type") as String
+                    let coordinates = result.valueForKeyPath("geometry.coordinates") as NSArray
+                    let id = result.valueForKeyPath("_id") as String
                     
                     if geometryType == "LineString" {
                         if let overlayCollection = self.mapView.overlays as? [PolylineWithAnnotations] {
@@ -84,7 +84,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
                             linepath.append(c)
                         }
                         let polyline = PolylineWithAnnotations(coordinates: &linepath, count: linepath.count)
-                        polyline.annotation = result.valueForKeyPath("description") as String
+                        polyline.annotation = result.valueForKeyPath("properties.Regulation") as String
                         polyline.id = id
                         println(polyline.annotation)
                         dispatch_async(dispatch_get_main_queue()) {
@@ -112,7 +112,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         
         let point = tap.locationInView(self.mapView)
         let tapCoordinate = mapView.convertPoint(point, toCoordinateFromView: self.mapView)
-        let region = MKCoordinateRegionMake(tapCoordinate, MKCoordinateSpanMake(0.000005, 0.000005))
+        let region = MKCoordinateRegionMake(tapCoordinate, MKCoordinateSpanMake(0.0000005, 0.0000005))
         let mapRect = MKMapRectForCoordinateRegion(region)
         
         var messages:String = ""

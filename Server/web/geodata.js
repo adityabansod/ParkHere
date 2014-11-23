@@ -1,26 +1,39 @@
 var dbUrl = process.env.MONGOLAB_URI || "sfstreets",
-    coll = ["streets"],
+    coll = ["parking"],
     db = require("mongojs").connect(dbUrl, coll),
     moment = require('moment');
+    console.log(dbUrl)
 exports.nearby = function(lat, lon, maxDistance, callbackFn) {
-    if (maxDistance > 1000) maxDistance = 1000;
+    if (maxDistance > 100) maxDistance = 100;
     console.log('Issuing query for ' + lat + ', ' + lon + ' at ' + maxDistance + 'm')
-    db.streets.find({
-        geometry: {
-            $near: { 
-                $geometry : {
-                    type: "Point",
-                    coordinates: [lon, lat]
-                },
-                $minDistance: 1,
-                $maxDistance: maxDistance
+    db.parking.find({
+        $and:
+        [
+            {
+                geometry: {
+                    $near: { 
+                        $geometry : {
+                            type: "Point",
+                            coordinates: [lon, lat]
+                        },
+                        $minDistance: 1,
+                        $maxDistance: maxDistance
+                    }
+                }
+            },
+            {
+                "properties.Regulation": { $ne: "Unregulated"}
             }
-        }
+        ]
     },
     function(err, res) {
         var today = new Date();
         var todayOfWeek = today.getDay();
-        var resultset = []
+        var resultset = [];
+        resultset = res;
+        callbackFn(resultset);
+        return;
+
 
         for (var i = 0; i < res.length; i++) {
             var sweep = res[i].properties;
