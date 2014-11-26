@@ -64,20 +64,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
             if let results = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &jsonError) as? NSArray {
                 for result in results {
-                    print("found a result with ")
-                    println(result.valueForKeyPath("properties.Regulation") as String)
+//                    print("found a result with ")
+//                    println(result.valueForKeyPath("properties.Regulation") as String)
                     let geometryType = result.valueForKeyPath("geometry.type") as String
                     let coordinates = result.valueForKeyPath("geometry.coordinates") as NSArray
                     let id = result.valueForKeyPath("_id") as String
                     
                     if geometryType == "LineString" {
-                        if let overlayCollection = self.mapView.overlays as? [PolylineWithAnnotations] {
-                            for overlay in overlayCollection {
-                                if id == (overlay as PolylineWithAnnotations).id {
-                                    return
-                                }
-                            }
-                        }
                         var linepath:[CLLocationCoordinate2D] = []
                         for cord in coordinates {
                             let c = CLLocationCoordinate2DMake(cord[1] as CLLocationDegrees, cord[0] as CLLocationDegrees)
@@ -86,8 +79,18 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
                         let polyline = PolylineWithAnnotations(coordinates: &linepath, count: linepath.count)
                         polyline.annotation = result.valueForKeyPath("properties.Regulation") as String
                         polyline.id = id
-                        println(polyline.annotation)
+                        
                         dispatch_async(dispatch_get_main_queue()) {
+                            // this is here since adding the overlay is async, therefore there are timing issues
+                            // between the main thread adding events faster than they exist in self.mapView.overlays
+                            // since dispatch_async is a queue, we can check here to ensure we're not double adding things
+                            if let overlayCollection = self.mapView.overlays as? [PolylineWithAnnotations] {
+                                for overlay in overlayCollection {
+                                    if id == (overlay as PolylineWithAnnotations).id {
+                                        return
+                                    }
+                                }
+                            }
                             self.mapView.addOverlay(polyline, level: MKOverlayLevel.AboveRoads)
                         }
                     }
@@ -104,12 +107,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         lookupSweepingForLocation(coordinate, maxDistance: 150)
     }
     
-    func gestureRecognizer(gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWithGestureRecognizer otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        return true
-    }
-    
     func handleOverlayTap(tap: UITapGestureRecognizer) {
-        
         let point = tap.locationInView(self.mapView)
         let tapCoordinate = mapView.convertPoint(point, toCoordinateFromView: self.mapView)
         let region = MKCoordinateRegionMake(tapCoordinate, MKCoordinateSpanMake(0.0000005, 0.0000005))
@@ -121,8 +119,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
             if(overlay is MKPolyline) {
                 let polygon = overlay as PolylineWithAnnotations
                 if(polygon.intersectsMapRect(mapRect)) {
-                    println(polygon.annotation)
-                    messages += polygon.annotation + "; "
+                    messages += polygon.annotation + " \(polygon.id); "
                 }
             }
         }
