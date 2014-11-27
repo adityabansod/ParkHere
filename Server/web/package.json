@@ -10,8 +10,9 @@
   "author": "Aditya Bansod (@adityabansod, http://www.adityabansod.net)",
   "license": "MIT",
   "dependencies": {
-    "express": "~3.4.7",
-    "moment": "^2.8.3"
+    "express": "^3.4.8",
+    "moment": "^2.8.4",
+    "async": "^0.9.0"
   },
   "engines": {
     "node": "0.10.x"

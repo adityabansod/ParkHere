@@ -1,70 +1,108 @@
 var dbUrl = process.env.MONGOLAB_URI || "sfstreets",
     coll = ["parking"],
-    db = require("mongojs").connect(dbUrl, coll),
-    moment = require('moment');
-    console.log(dbUrl)
+    db = require("mongojs").connect(dbUrl),
+    moment = require('moment'),
+    async = require('async');
+    console.log('db url = ' + dbUrl + ' ' + coll);
 exports.nearby = function(lat, lon, maxDistance, callbackFn) {
-    if (maxDistance > 100) maxDistance = 100;
-    console.log('Issuing query for ' + lat + ', ' + lon + ' at ' + maxDistance + 'm')
-    db.parking.find({
+    if (maxDistance > 250) maxDistance = 250;
+    console.log('Issuing query for ' + lat + ', ' + lon + ' at ' + maxDistance + 'm');
+    queryForBlockface(lat, lon, maxDistance, callbackFn);
+}
+
+function queryForBlockface(lat, lon, maxDistance, callbackFn) {
+    db.collection('parking').find({
         $and:
         [
             {
                 geometry: {
                     $near: { 
-                        $geometry : {
-                            type: "Point",
-                            coordinates: [lon, lat]
-                        },
-                        $minDistance: 1,
+                        $geometry: { "type": "Point",  "coordinates": [ lon, lat ] },
+                        $minDistance: 0,
                         $maxDistance: maxDistance
                     }
                 }
             },
             {
-                "properties.Regulation": { $ne: "Unregulated"}
+                "properties.Regulation": { $ne: null }
             }
         ]
     },
     function(err, res) {
-        var today = new Date();
-        var todayOfWeek = today.getDay();
-        var resultset = [];
-        resultset = res;
-        callbackFn(resultset);
-        return;
-
-
-        for (var i = 0; i < res.length; i++) {
-            var sweep = res[i].properties;
-
-            // isSweepInNext24Hours(sweep)
-
-            var sweepingDay = convertWeekdayStringToNumber(sweep.WEEKDAY);
-            if( todayOfWeek == sweepingDay ||
-                addOneDayOfWeek(todayOfWeek) == sweepingDay ||
-                sweepingDay == 7) {
-                
-                var desc = sweep.LF_FADD + 
-                    '-' + sweep.LF_TOADD +
-                    ' ' + 
-                    sweep.STREETNAME +
-                    ' will be swept on ' +
-                    sweep.WEEKDAY +
-                    ' from ' +
-                    sweep.FROMHOUR +
-                    ' to ' +
-                    sweep.TOHOUR +
-                    ' on the ' +
-                    sweep.BLOCKSIDE +
-                    ' side';
-
-
-                resultset.push({"description": desc, "datapoint": res[i]});
-            }
-        };
-        callbackFn(resultset);
+        queryForStreetSweeping(res, callbackFn);
     });
+}
+
+function queryForStreetSweeping(blockfaceResult, callbackFn) {
+    console.log('querying for street sweeping against ' + blockfaceResult.length + ' faces');
+    // build up the list of queries
+    var queries = [];
+    for (var i = 0; i < blockfaceResult.length; i++) {
+        var query = (function(callback) {
+            var blockface = this;
+            var lat = blockface.geometry.coordinates[0][1];
+            var lon = blockface.geometry.coordinates[0][0];
+            console.log('quering for blockface id ' + blockface._id);
+
+            db.collection('streets').find({
+                    geometry: {
+                        $near: { "type": "Point", "coordinates": [lon, lat] },
+                        $minDistance: 0,
+                        $maxDistance: 10
+                    }
+                }
+            ,
+            (function(err, res) {
+                this.sweepings = res;
+                console.log('found ' + res.length + ' sweeping results for ' + this._id);
+                callback(err, this);
+            }).bind(blockface));
+        }).bind(blockfaceResult[i]);
+
+        queries.push(query);
+    };
+
+    console.log('running ' + queries.length + ' in parallel');
+    async.parallel(queries, function(err, results) {
+        if(err) throw err;
+        callbackFn(results);
+    });
+}
+
+function prettyPrintSweepingRules() {
+
+    var today = new Date();
+    var todayOfWeek = today.getDay();
+    var resultset = [];
+
+    for (var i = 0; i < res.length; i++) {
+        var sweep = res[i].properties;
+
+        // isSweepInNext24Hours(sweep)
+
+        var sweepingDay = convertWeekdayStringToNumber(sweep.WEEKDAY);
+        if( todayOfWeek == sweepingDay ||
+            addOneDayOfWeek(todayOfWeek) == sweepingDay ||
+            sweepingDay == 7) {
+            
+            var desc = sweep.LF_FADD + 
+                '-' + sweep.LF_TOADD +
+                ' ' + 
+                sweep.STREETNAME +
+                ' will be swept on ' +
+                sweep.WEEKDAY +
+                ' from ' +
+                sweep.FROMHOUR +
+                ' to ' +
+                sweep.TOHOUR +
+                ' on the ' +
+                sweep.BLOCKSIDE +
+                ' side';
+
+
+            resultset.push({"description": desc, "datapoint": res[i]});
+        }
+    };
 }
 
 function isSweepInNext24Hours(properties) {
