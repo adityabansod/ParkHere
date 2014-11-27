@@ -8,7 +8,6 @@ Download and unzip those.
 
 # Convert Shapefiles to WGS84 Projection
 
-
 The SF shapefiles are in Northern California specific projection (2227). Lat/long coordinates are in WGS84 projection (4326)
 
 Download the GDAL tools (http://trac.osgeo.org/gdal/wiki/DownloadingGdalBinaries) to get access to the ogr2ogr tool to directly convert.
