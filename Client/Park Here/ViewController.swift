@@ -27,8 +27,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         locationManager?.desiredAccuracy = kCLLocationAccuracyBest
         locationManager?.requestWhenInUseAuthorization()
         locationManager?.startUpdatingLocation()
-        locationManager?.startMonitoringSignificantLocationChanges()
-        locationManager?.startUpdatingHeading()
         mapView.showsUserLocation = true
         mapView.delegate = self
     }
@@ -51,7 +49,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     
     func lookupSweepingForLocation(coordinate:CLLocationCoordinate2D, maxDistance:Int) {
         
-//        let url = NSURL(string: "https://obscure-journey-3692.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
+        // let url = NSURL(string: "https://obscure-journey-3692.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
         
         let url = NSURL(string: "http://localhost:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
         
@@ -77,7 +75,28 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
                             linepath.append(c)
                         }
                         let polyline = PolylineWithAnnotations(coordinates: &linepath, count: linepath.count)
-                        polyline.annotation = result.valueForKeyPath("properties.Regulation") as String
+                        
+                        
+                        if let sweepings = result.valueForKeyPath("sweepings") as? NSArray {
+                            if sweepings.count > 0 {
+                                let sweeping = sweepings[0] as NSDictionary
+                                if let desc = sweeping.valueForKey("description") as? String {
+                                    polyline.annotation += desc + ". "
+                                }
+                            }
+                        }
+                        
+                        let regs = result.valueForKeyPath("properties.Regulation") as String;
+                        switch regs {
+                        case "Unregulated":
+                            polyline.annotation += "There are no permits or meters on this street."
+                        case "RPP":
+                            polyline.annotation += "This street requires a parking permit."
+                        case "Metered":
+                            polyline.annotation += "This street has parking meters."
+                        default:
+                            polyline.annotation += regs
+                        }
                         polyline.id = id
                         
                         dispatch_async(dispatch_get_main_queue()) {
@@ -93,6 +112,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
                             }
                             self.mapView.addOverlay(polyline, level: MKOverlayLevel.AboveRoads)
                         }
+                    } else {
+                        println("found geometry other than a linestring, bailing");
                     }
                     
                 }
@@ -119,7 +140,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
             if(overlay is MKPolyline) {
                 let polygon = overlay as PolylineWithAnnotations
                 if(polygon.intersectsMapRect(mapRect)) {
-                    messages += polygon.annotation + " \(polygon.id); "
+                    messages += polygon.annotation
                 }
             }
         }
