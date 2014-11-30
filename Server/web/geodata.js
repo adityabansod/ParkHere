@@ -64,6 +64,7 @@ function queryForStreetSweeping(blockfaceResult, callbackFn) {
             ,
             (function(err, res) {
                 var sweepings =  res;
+
                 // console.log('filtered ' + sweepings.length + ' of ' + res.length + ' sweeping results for ' + this._id);
                 if(sweepings.length > 0) {
                     /*
@@ -83,8 +84,7 @@ function queryForStreetSweeping(blockfaceResult, callbackFn) {
                             sweepSlope = calculateLineSlope(sweep.geometry.coordinates,
                                                             sweep.properties.STREETNAME).slope,
                             sweepDelta = (slope - sweepSlope);
-
-                            if(Math.min(delta, sweepDelta) == sweepDelta) {
+                            if((Math.min(delta, sweepDelta)) == sweepDelta &&  (slope/sweepSlope) > 0.7) {
                                 this.street = sweep.properties.STREETNAME;
                                 delta = sweepDelta;
                             }
@@ -136,10 +136,12 @@ function queryForStreetSweeping(blockfaceResult, callbackFn) {
         }
 
         for (var i = 0; i < results.length; i++) {
+            // 5. create printable strings for each sweeping
             var street = results[i];
+
+            // 6. find the street directions
             var pair = findStreetById(results, street.pairStreet._id);
 
-            // 5. find the street directions
 
             var directionOneSide;
             var directionOtherSide;
@@ -151,10 +153,12 @@ function queryForStreetSweeping(blockfaceResult, callbackFn) {
             });
             directionOtherSide = calculateOpposingBlockside(directionOneSide);
 
+            if(street.sweepings.length == 0) continue;
+
             if(directionOneSide == null) {
+                street.sweepings = createDescriptionForSweepings(street.sweepings);
                 continue;
             }
-            if(street.sweepings.length == 0) continue;
             
             if(directionOneSide.indexOf("North") > -1 || directionOtherSide.indexOf("North") > -1) {
                 if(Math.min(street.centerpoint[1],pair.centerpoint[1]) == street.centerpoint[1]) {
@@ -197,8 +201,6 @@ function queryForStreetSweeping(blockfaceResult, callbackFn) {
             }
 
             street.sweepings = createDescriptionForSweepings(street.sweepings);
-
-            console.log(directionOneSide, directionOtherSide , street.street)
         };
         callbackFn(results);
     });
@@ -300,11 +302,16 @@ function createDescriptionForSweepings(sweepings) {
                 ' from ' +
                 sweep.FROMHOUR +
                 ' to ' +
-                sweep.TOHOUR +
-                ' on the ' +
-                sweep.BLOCKSIDE +
-                ' side';
+                sweep.TOHOUR;
 
+            if(sweep.BLOCKSIDE != null) {
+                desc += ' on the ' +
+                sweep.BLOCKSIDE +
+                ' side.';
+            } else {
+                desc += ' on both sides.'
+            }
+                
 
             resultset.push({"description": desc, "datapoint": sweepings[i]});
         }

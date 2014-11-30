@@ -49,7 +49,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     
     func lookupSweepingForLocation(coordinate:CLLocationCoordinate2D, maxDistance:Int) {
         
-        // let url = NSURL(string: "https://obscure-journey-3692.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
+        //let url = NSURL(string: "https://obscure-journey-3692.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
         
         let url = NSURL(string: "http://localhost:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
         
@@ -76,27 +76,46 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
                         }
                         let polyline = PolylineWithAnnotations(coordinates: &linepath, count: linepath.count)
                         
+                        if let streetName = result.valueForKeyPath("street") as? String {
+                            polyline.street = "Parking Rules for \(streetName)"
+                        } else {
+                            polyline.street = "Parking Rules"
+                        }
                         
                         if let sweepings = result.valueForKeyPath("sweepings") as? NSArray {
                             if sweepings.count > 0 {
                                 let sweeping = sweepings[0] as NSDictionary
                                 if let desc = sweeping.valueForKey("description") as? String {
-                                    polyline.annotation += desc + ". "
+                                    polyline.annotation += desc + " "
                                 }
                             }
                         }
                         
+                        
+                        
                         let regs = result.valueForKeyPath("properties.Regulation") as String;
                         switch regs {
                         case "Unregulated":
-                            polyline.annotation += "There are no permits or meters on this street."
+                            polyline.annotation += "There are no permits or meters on this block."
                         case "RPP":
-                            polyline.annotation += "This street requires a parking permit."
+                            if let permitArea = result.valueForKeyPath("properties.PermitArea") as? String {
+                                if let permitHours = result.valueForKeyPath("properties.Hours") as? String {
+                                    if let permitDays = result.valueForKeyPath("properties.Days") as? String {
+                                        if let permitHourLimit = result.valueForKeyPath("properties.HrLimit") as? Int {
+                                            polyline.annotation += "There is a \(permitHourLimit) hour limit here unless you have a type \(permitArea) permit. This is enforced \(permitDays) \(permitHours)."
+                                        }
+                                    }
+                                }
+                            } else {
+                                polyline.annotation += "This block requires a residential parking permit."
+                            }
                         case "Metered":
-                            polyline.annotation += "This street has parking meters."
+                            polyline.annotation += "This block has parking meters."
                         default:
                             polyline.annotation += regs
                         }
+                        
+                        polyline.annotation = polyline.annotation.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
                         polyline.id = id
                         
                         dispatch_async(dispatch_get_main_queue()) {
@@ -131,21 +150,33 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     func handleOverlayTap(tap: UITapGestureRecognizer) {
         let point = tap.locationInView(self.mapView)
         let tapCoordinate = mapView.convertPoint(point, toCoordinateFromView: self.mapView)
-        let region = MKCoordinateRegionMake(tapCoordinate, MKCoordinateSpanMake(0.0000005, 0.0000005))
+//        let region = MKCoordinateRegionMake(tapCoordinate, MKCoordinateSpanMake(0.00000005, 0.00000005))
+        let region = MKCoordinateRegionMakeWithDistance(tapCoordinate, 1.0, 1.0)
         let mapRect = MKMapRectForCoordinateRegion(region)
         
+        UIGraphicsBeginImageContext(self.view.bounds.size)
+        let ctx = UIGraphicsGetCurrentContext()
+        CGContextSetFillColor(ctx, CGColorGetComponents(UIColor.yellowColor().CGColor))
+        CGContextFillRect(ctx, CGRectMake(CGFloat(mapRect.origin.x), CGFloat(mapRect.origin.y), CGFloat(mapRect.size.width), CGFloat(mapRect.size.height)))
+        self.view.layer.renderInContext(ctx)
+        UIGraphicsEndImageContext()
+        
+        
         var messages:String = ""
+        var title:String = ""
         
         for overlay in self.mapView.overlays {
             if(overlay is MKPolyline) {
                 let polygon = overlay as PolylineWithAnnotations
                 if(polygon.intersectsMapRect(mapRect)) {
-                    messages += polygon.annotation
+                    messages += polygon.annotation + " "
+                    title = polygon.street
+                    println("Creating alert for \(polygon.id)")
                 }
             }
         }
         if messages != "" {
-            createAlert("Upcoming Restrictions", message: messages)
+            createAlert(title, message: messages)
         }
     }
     
