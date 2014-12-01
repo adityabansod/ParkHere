@@ -13,5 +13,4 @@ class PolylineWithAnnotations: MKPolyline {
     var annotation:String = ""
     var id:String = ""
     var street:String = ""
-   
 }

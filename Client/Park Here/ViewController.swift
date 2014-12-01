@@ -49,10 +49,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     
     func lookupSweepingForLocation(coordinate:CLLocationCoordinate2D, maxDistance:Int) {
         
-        //let url = NSURL(string: "https://obscure-journey-3692.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
-        
-        let url = NSURL(string: "http://localhost:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
-        
+        #if DEBUG
+            let url = NSURL(string: "http://localhost:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
+        #else
+            let url = NSURL(string: "https://obscure-journey-3692.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
+        #endif
+            
         var jsonError: NSError?
         
         let tap = UITapGestureRecognizer(target: self, action: Selector("handleOverlayTap:"))
@@ -150,7 +152,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     func handleOverlayTap(tap: UITapGestureRecognizer) {
         let point = tap.locationInView(self.mapView)
         let tapCoordinate = mapView.convertPoint(point, toCoordinateFromView: self.mapView)
-//        let region = MKCoordinateRegionMake(tapCoordinate, MKCoordinateSpanMake(0.00000005, 0.00000005))
         let region = MKCoordinateRegionMakeWithDistance(tapCoordinate, 1.0, 1.0)
         let mapRect = MKMapRectForCoordinateRegion(region)
         
