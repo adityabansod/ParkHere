@@ -93,6 +93,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
                                 if let desc = sweeping.valueForKey("description") as? String {
                                     polyline.annotation += desc + " "
                                 }
+                                polyline.sweepings = sweepings
                             }
                         }
                         
@@ -113,6 +114,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
                             } else {
                                 polyline.annotation += "This block requires a residential parking permit."
                             }
+                        case "Time limited": // TODO: ollapse this logic with RPP. it's the same except it has no permit area
+                            if let permitHours = result.valueForKeyPath("properties.Hours") as? String {
+                                if let permitDays = result.valueForKeyPath("properties.Days") as? String {
+                                    if let permitHourLimit = result.valueForKeyPath("properties.HrLimit") as? Int {
+                                        polyline.annotation += "There is a \(permitHourLimit) hour limit here. This is enforced \(permitDays) \(permitHours)."
+                                    }
+                                }
+                            } else {
+                                polyline.annotation += "This block requires a residential parking permit."
+                            }
+                            
                         case "Metered":
                             polyline.annotation += "This block has parking meters."
                         default:
@@ -160,23 +172,39 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         var messages:String = ""
         var title:String = ""
         
+        var candidateMatches:[AnyObject] = []
+        
         for overlay in self.mapView.overlays {
             if(overlay is MKPolyline) {
                 let polygon = overlay as PolylineWithAnnotations
                 if(polygon.intersectsMapRect(mapRect)) {
                     let dist = wgs84distance(tapCoordinate, loc2: polygon.centerpoint)
-                    if dist > 50 {
-                        continue
-                    }
+                    
                     // eventually replace this w/ the closests match
                     if title == "" {
                         title = polygon.street
                     }
-                    messages += polygon.annotation + " "
-                    println("Creating alert for \(polygon.id) at distance \(dist)")
+                    
+                    candidateMatches.append([polygon, dist])
                 }
             }
         }
+        
+        // now sort by distane to pick the street name
+        
+        // TODO then elimiate the ones that don't match
+        // the street name and that are too far away
+        for candidate in candidateMatches {
+            let polyline = candidate[0] as PolylineWithAnnotations
+            let dist = candidate[1] as Double
+            
+            if dist > 50 {continue}
+            if polyline.street != title {continue}
+            
+            messages += polyline.annotation + " "
+            println("Creating alert for \(polyline.id) at distance \(dist)")
+        }
+        
         if messages != "" {
             createAlert(title, message: messages)
         }
@@ -251,9 +279,18 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     }
     
     func mapView(mapView: MKMapView!, rendererForOverlay overlay: MKOverlay!) -> MKOverlayRenderer! {
-        if overlay is MKPolyline {
-            var polylineRenderer = MKPolylineRenderer(overlay: overlay)
-            polylineRenderer.strokeColor = UIColor.redColor()
+        if overlay is PolylineWithAnnotations {
+            let poly = overlay as PolylineWithAnnotations
+            
+            var polylineRenderer = MKPolylineRenderer(overlay: poly)
+            if poly.hasAnyRestrictions {
+                polylineRenderer.strokeColor = UIColor.redColor()
+            } else if poly.hasSomeRestrictions {
+                polylineRenderer.strokeColor = UIColor.yellowColor()
+            } else {
+                polylineRenderer.strokeColor = UIColor.greenColor()
+            }
+            
             polylineRenderer.lineWidth = 4
             return polylineRenderer
         } else {
