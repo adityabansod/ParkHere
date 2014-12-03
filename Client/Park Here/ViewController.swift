@@ -37,7 +37,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     
     func locationManager(manager: CLLocationManager!, didUpdateLocations locations: [AnyObject]!) {
         let location = locations.last as CLLocation
-        let coordiateRegion = MKCoordinateRegionMake(location.coordinate, MKCoordinateSpanMake(0.005, 0.005))
+        let coordiateRegion = MKCoordinateRegionMake(location.coordinate, MKCoordinateSpanMake(0.0005, 0.0005))
         
         mapView.setRegion(coordiateRegion, animated: false)
         lookupSweepingForLocation(location.coordinate)
@@ -77,6 +77,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
                             linepath.append(c)
                         }
                         let polyline = PolylineWithAnnotations(coordinates: &linepath, count: linepath.count)
+                        let centerJson = result.valueForKeyPath("centerpoint") as NSArray
+                        
+                        polyline.centerpoint = CLLocationCoordinate2DMake(centerJson[0] as CLLocationDegrees, centerJson[1] as CLLocationDegrees)
                         
                         if let streetName = result.valueForKeyPath("street") as? String {
                             polyline.street = "Parking Rules for \(streetName)"
@@ -92,7 +95,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
                                 }
                             }
                         }
-                        
                         
                         
                         let regs = result.valueForKeyPath("properties.Regulation") as String;
@@ -155,14 +157,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         let region = MKCoordinateRegionMakeWithDistance(tapCoordinate, 1.0, 1.0)
         let mapRect = MKMapRectForCoordinateRegion(region)
         
-        UIGraphicsBeginImageContext(self.view.bounds.size)
-        let ctx = UIGraphicsGetCurrentContext()
-        CGContextSetFillColor(ctx, CGColorGetComponents(UIColor.yellowColor().CGColor))
-        CGContextFillRect(ctx, CGRectMake(CGFloat(mapRect.origin.x), CGFloat(mapRect.origin.y), CGFloat(mapRect.size.width), CGFloat(mapRect.size.height)))
-        self.view.layer.renderInContext(ctx)
-        UIGraphicsEndImageContext()
-        
-        
         var messages:String = ""
         var title:String = ""
         
@@ -170,9 +164,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
             if(overlay is MKPolyline) {
                 let polygon = overlay as PolylineWithAnnotations
                 if(polygon.intersectsMapRect(mapRect)) {
+                    let dist = wgs84distance(tapCoordinate, loc2: polygon.centerpoint)
+                    if dist > 50 {
+                        continue
+                    }
+                    // eventually replace this w/ the closests match
+                    if title == "" {
+                        title = polygon.street
+                    }
                     messages += polygon.annotation + " "
-                    title = polygon.street
-                    println("Creating alert for \(polygon.id)")
+                    println("Creating alert for \(polygon.id) at distance \(dist)")
                 }
             }
         }
@@ -225,6 +226,21 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         let metersInLongitude = loc3.distanceFromLocation(loc4)
         
         return Int(max(metersInLatitude, metersInLongitude))
+    }
+    
+    func wgs84distance(loc1:CLLocationCoordinate2D, loc2:CLLocationCoordinate2D) -> Double {
+        
+        let radlat1 = M_PI * loc1.latitude/180;
+        let radlat2 = M_PI * loc2.latitude/180;
+        let radlon1 = M_PI * loc1.longitude/180;
+        let radlon2 = M_PI * loc2.longitude/180;
+        let theta = loc1.longitude - loc2.longitude;
+        let radtheta = M_PI * theta/180;
+        var dist = sin(radlat1) * sin(radlat2) + cos(radlat1) * cos(radlat2) * cos(radtheta);
+        dist = acos(dist);
+        dist = dist * 180/M_PI;
+        dist = dist * 60 * 1.1515;
+        return dist * 1.609344 * 1000;
     }
     
     func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {

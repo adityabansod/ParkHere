@@ -13,4 +13,5 @@ class PolylineWithAnnotations: MKPolyline {
     var annotation:String = ""
     var id:String = ""
     var street:String = ""
+    var centerpoint:CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: 0, longitude: 0)
 }
