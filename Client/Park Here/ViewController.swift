@@ -49,12 +49,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     
     func lookupSweepingForLocation(coordinate:CLLocationCoordinate2D, maxDistance:Int) {
         
-        #if DEBUG
+//        #if DEBUG
             let url = NSURL(string: "http://localhost:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
-        #else
-            let url = NSURL(string: "https://obscure-journey-3692.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
-        #endif
-            
+//       #else
+//           let url = NSURL(string: "https://obscure-journey-3692.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
+//        #endif
+        
         var jsonError: NSError?
         
         let tap = UITapGestureRecognizer(target: self, action: Selector("handleOverlayTap:"))
@@ -90,6 +90,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
                         if let sweepings = result.valueForKeyPath("sweepings") as? NSArray {
                             if sweepings.count > 0 {
                                 let sweeping = sweepings[0] as NSDictionary
+                                // TODO: this should be the upcoming sweepings but right now we're
+                                // only grabbing the very first one which isn't accurate for streets
+                                // like Mission which have multiple sweepings.
                                 if let desc = sweeping.valueForKey("description") as? String {
                                     polyline.annotation += desc + " "
                                 }
@@ -173,6 +176,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         var title:String = ""
         
         var candidateMatches:[AnyObject] = []
+        var closestDistance:Double = 1000
+        var closestMatch:PolylineWithAnnotations = PolylineWithAnnotations()
         
         for overlay in self.mapView.overlays {
             if(overlay is MKPolyline) {
@@ -180,9 +185,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
                 if(polygon.intersectsMapRect(mapRect)) {
                     let dist = wgs84distance(tapCoordinate, loc2: polygon.centerpoint)
                     
-                    // eventually replace this w/ the closests match
-                    if title == "" {
-                        title = polygon.street
+                    // find the closest match
+                    if dist < closestDistance {
+                        closestMatch = polygon
+                        closestDistance = dist
                     }
                     
                     candidateMatches.append([polygon, dist])
@@ -190,15 +196,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
             }
         }
         
-        // now sort by distane to pick the street name
+        // pick the street name from the closest match
+        title = closestMatch.street
         
-        // TODO then elimiate the ones that don't match
+        
+        // Elimiate the ones that don't match
         // the street name and that are too far away
         for candidate in candidateMatches {
             let polyline = candidate[0] as PolylineWithAnnotations
             let dist = candidate[1] as Double
             
-            if dist > 50 {continue}
+            if dist > 75 {continue}
             if polyline.street != title {continue}
             
             messages += polyline.annotation + " "
