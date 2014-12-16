@@ -202,10 +202,25 @@ function queryForStreetSweeping(blockfaceResult, callbackFn) {
 
             street.sweepings = createDescriptionForSweepings(street.sweepings);
         };
-        callbackFn(results);
+
+        callbackFn(slimDataSet(results));
     });
 }
 
+function slimDataSet(results) {
+    for (var i = 0; i < results.length; i++) {
+        var thisResult = results[i];
+        delete thisResult.type;
+        delete thisResult.streetSlopeAndDirection;
+        delete thisResult.pairStreet;
+        for (var j = 0; j < thisResult.sweepings.length; j++) {
+            // delete thisResult.sweepings[j].type;
+            delete thisResult.sweepings[j].datapoint;
+        };
+    };
+    return results;
+
+}
 
 function calculateOpposingBlockside(directionOneSide) {
     var directionOtherSide;
