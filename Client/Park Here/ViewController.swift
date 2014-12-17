@@ -12,6 +12,7 @@ import CoreLocation
 
 class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate, UIGestureRecognizerDelegate {
 
+    var networkRequestPending:Bool = false
     var locationManager:CLLocationManager?
     @IBOutlet var mapView:MKMapView!
 
@@ -49,6 +50,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     
     func lookupSweepingForLocation(coordinate:CLLocationCoordinate2D, maxDistance:Int) {
         
+        if !shouldLookupSweeping() {
+            return
+        }
+        
 //        #if DEBUG
             let url = NSURL(string: "http://localhost:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
 //       #else
@@ -63,6 +68,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         
         let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
             if let results = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &jsonError) as? NSArray {
+                self.networkRequestPending = false
                 for result in results {
 //                    print("found a result with ")
 //                    println(result.valueForKeyPath("properties.Regulation") as String)
@@ -159,11 +165,26 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
             
         }
         task.resume()
+        networkRequestPending = true
 
     }
     
     func lookupSweepingForLocation(coordinate:CLLocationCoordinate2D) {
         lookupSweepingForLocation(coordinate, maxDistance: 150)
+    }
+    
+    func shouldLookupSweeping() -> Bool {
+        if networkRequestPending {
+            println("skipping network request")
+            NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: "clearNetworkPendingFlag", userInfo: nil, repeats: false)
+            return false
+        } else {
+            return true
+        }
+    }
+    
+    func clearNetworkPendingFlag() {
+        networkRequestPending = false
     }
     
     func handleOverlayTap(tap: UITapGestureRecognizer) {
