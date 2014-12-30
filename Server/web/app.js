@@ -2,6 +2,7 @@ var express = require('express'),
     geodata = require('./geodata.js'),
     app = express(),
     port = process.env.PORT || 5000;
+app.use(express.compress());
 
 app.get('/nearby/:lat/:lon', function(req, res) {
     console.log(req.method + ' request: ' + req.url);
