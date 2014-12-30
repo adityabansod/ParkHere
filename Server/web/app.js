@@ -5,7 +5,10 @@ var express = require('express'),
 app.use(express.compress());
 
 app.get('/nearby/:lat/:lon', function(req, res) {
+    var started = new Date();
     console.log(req.method + ' request: ' + req.url);
+            console.log((new Date()).getTime() + 'ms')
+
     var lat = parseFloat(req.params.lat),
         lon = parseFloat(req.params.lon);
     if(req.query.maxDistance != null)
@@ -13,7 +16,8 @@ app.get('/nearby/:lat/:lon', function(req, res) {
     else
     	maxDistance = 150;
     geodata.nearby(lat, lon, maxDistance, function(docs) {
-    	res.send(docs);
+    	console.log('answered ' + req.url + ' in ' + ((new Date()).getTime() - started.getTime()) + 'ms');
+        res.send(docs);
     });
 });
 app.listen(port);
