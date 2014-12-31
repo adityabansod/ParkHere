@@ -1,9 +1,10 @@
 var dbUrl = process.env.MONGOLAB_URI || "sfstreets",
     db = require("mongojs").connect(dbUrl),
     moment = require('moment'),
-    async = require('async');
+    async = require('async'),
+    settings = require('./settings.js');
 exports.nearby = function(lat, lon, maxDistance, callbackFn) {
-    if (maxDistance > 250) maxDistance = 250;
+    if (maxDistance > 250) maxDistance = settings().maxDistance;
     console.log('Issuing query for blockfaces at ' + lat + ', ' + lon + ' at ' + maxDistance + 'm');
     queryForBlockface(lat, lon, maxDistance, callbackFn);
 }
@@ -84,7 +85,7 @@ function queryForStreetSweeping(blockfaceResult, callbackFn) {
                             sweepSlope = calculateLineSlope(sweep.geometry.coordinates,
                                                             sweep.properties.STREETNAME).slope,
                             sweepDelta = (slope - sweepSlope);
-                            if((Math.min(delta, sweepDelta)) == sweepDelta &&  (slope/sweepSlope) > 0.7) {
+                            if((Math.min(delta, sweepDelta)) == sweepDelta &&  (slope/sweepSlope) > settings().slopeTolerance) {
                                 this.street = sweep.properties.STREETNAME;
                                 delta = sweepDelta;
                             }
@@ -120,7 +121,7 @@ function queryForStreetSweeping(blockfaceResult, callbackFn) {
                 var cord2Slope = calculateLineSlope(results[j].geometry.coordinates).slope;
 
                 if(Math.min(distance, minDistance) == distance && distance != 0) {
-                    if(cord1Slope / cord2Slope > 0.7) {
+                    if(cord1Slope / cord2Slope > settings().slopeTolerance) {
                         if(results[i].street == results[j].street) {
                             minDistance = distance;
                             pairStreet = results[j];
