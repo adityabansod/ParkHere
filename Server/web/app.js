@@ -9,7 +9,6 @@ app.use(express.compress());
 app.get('/nearby/:lat/:lon', function(req, res) {
     var started = new Date();
     console.log(req.method + ' request: ' + req.url);
-            console.log((new Date()).getTime() + 'ms')
 
     var lat = parseFloat(req.params.lat),
         lon = parseFloat(req.params.lon);
