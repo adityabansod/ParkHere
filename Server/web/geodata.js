@@ -215,7 +215,10 @@ function slimDataSet(results) {
         delete thisResult.streetSlopeAndDirection;
         delete thisResult.pairStreet;
         for (var j = 0; j < thisResult.sweepings.length; j++) {
-            // delete thisResult.sweepings[j].type;
+            thisResult.sweepings[j].weekday = thisResult.sweepings[j].datapoint.properties.WEEKDAY;
+            thisResult.sweepings[j].from = thisResult.sweepings[j].datapoint.properties.FROMHOUR;
+            thisResult.sweepings[j].to = thisResult.sweepings[j].datapoint.properties.TOHOUR;
+            
             delete thisResult.sweepings[j].datapoint;
         };
     };

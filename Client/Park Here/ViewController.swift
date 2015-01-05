@@ -14,7 +14,16 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
 
     var networkRequestPending:Bool = false
     var locationManager:CLLocationManager?
+    
     @IBOutlet var mapView:MKMapView!
+    @IBOutlet weak var sundayLabel: UILabel!
+    @IBOutlet weak var mondayLabel: UILabel!
+    @IBOutlet weak var tuesdayLabel: UILabel!
+    @IBOutlet weak var wednesdayLabel: UILabel!
+    @IBOutlet weak var thursdayLabel: UILabel!
+    @IBOutlet weak var fridayLabel: UILabel!
+    @IBOutlet weak var saturdayLabel: UILabel!
+    @IBOutlet weak var streetNameLabel: UILabel!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,7 +64,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         }
         
 //        #if DEBUG
-            let url = NSURL(string: "http://localhost:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
+            let url = NSURL(string: "http://192.168.1.186:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
 //       #else
 //           let url = NSURL(string: "https://obscure-journey-3692.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
 //        #endif
@@ -88,20 +97,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
                         polyline.centerpoint = CLLocationCoordinate2DMake(centerJson[0] as CLLocationDegrees, centerJson[1] as CLLocationDegrees)
                         
                         if let streetName = result.valueForKeyPath("street") as? String {
-                            polyline.street = "Parking Rules for \(streetName)"
+                            polyline.street = streetName
                         } else {
-                            polyline.street = "Parking Rules"
+                            polyline.street = "Unknown"
                         }
                         
                         if let sweepings = result.valueForKeyPath("sweepings") as? NSArray {
                             if sweepings.count > 0 {
-                                let sweeping = sweepings[0] as NSDictionary
-                                // TODO: this should be the upcoming sweepings but right now we're
-                                // only grabbing the very first one which isn't accurate for streets
-                                // like Mission which have multiple sweepings.
-                                if let desc = sweeping.valueForKey("description") as? String {
-                                    polyline.annotation += desc + " "
-                                }
                                 polyline.sweepings = sweepings
                             }
                         }
@@ -200,8 +202,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         var closestDistance:Double = 1000
         var closestMatch:PolylineWithAnnotations = PolylineWithAnnotations()
         
-        for overlay in self.mapView.overlays {
-            if(overlay is MKPolyline) {
+        if let overlayCollection = self.mapView.overlays as? [MKPolyline] {
+            for overlay in overlayCollection {
                 let polygon = overlay as PolylineWithAnnotations
                 if(polygon.intersectsMapRect(mapRect)) {
                     let dist = wgs84distance(tapCoordinate, loc2: polygon.centerpoint)
@@ -215,28 +217,89 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
                     candidateMatches.append([polygon, dist])
                 }
             }
-        }
-        
-        // pick the street name from the closest match
-        title = closestMatch.street
-        
-        
-        // Elimiate the ones that don't match
-        // the street name and that are too far away
-        for candidate in candidateMatches {
-            let polyline = candidate[0] as PolylineWithAnnotations
-            let dist = candidate[1] as Double
             
-            if dist > 75 {continue}
-            if polyline.street != title {continue}
+            // pick the street name from the closest match
+            title = closestMatch.street
             
-            messages += polyline.annotation + " "
-            println("Creating alert for \(polyline.id) at distance \(dist)")
+            // Elimiate the ones that don't match
+            // the street name and that are too far away
+            for candidate in candidateMatches {
+                let polyline = candidate[0] as PolylineWithAnnotations
+                let dist = candidate[1] as Double
+                
+                if dist > 75 {continue}
+                if polyline.street != title {continue}
+                
+                updateCalendarOverlay(polyline)
+
+                
+                messages += polyline.annotation + " "
+                println("Creating alert for \(polyline.id) at distance \(dist)")
+            }
+            
+//            if messages != "" {
+//                createAlert(title, message: messages)
+//            }
         }
+    }
+    
+    func resetCalendarOverlay() {
+        mondayLabel.hidden = true
+        tuesdayLabel.hidden = true
+        wednesdayLabel.hidden = true
+        thursdayLabel.hidden = true
+        fridayLabel.hidden = true
+        saturdayLabel.hidden = true
+        sundayLabel.hidden = true
+        streetNameLabel.hidden = true
         
-        if messages != "" {
-            createAlert(title, message: messages)
+        mondayLabel.textColor = UIColor.blackColor()
+        tuesdayLabel.textColor = UIColor.blackColor()
+        wednesdayLabel.textColor = UIColor.blackColor()
+        thursdayLabel.textColor = UIColor.blackColor()
+        fridayLabel.textColor = UIColor.blackColor()
+        saturdayLabel.textColor = UIColor.blackColor()
+        sundayLabel.textColor = UIColor.blackColor()
+    }
+    
+    func updateCalendarOverlay(polyline: PolylineWithAnnotations) {
+        resetCalendarOverlay()
+        
+        mondayLabel.hidden = false
+        tuesdayLabel.hidden = false
+        wednesdayLabel.hidden = false
+        thursdayLabel.hidden = false
+        fridayLabel.hidden = false
+        saturdayLabel.hidden = false
+        sundayLabel.hidden = false
+        streetNameLabel.hidden = false
+        
+        for sweeping in polyline.sweepings {
+            if let day = sweeping.valueForKeyPath("weekday") as? String {
+                switch day {
+                    case "Mon":
+                        mondayLabel.textColor = UIColor.redColor()
+                    case "Tues":
+                        println("found round \(tuesdayLabel.textColor) + \(tuesdayLabel.text)")
+                        tuesdayLabel.textColor = UIColor.redColor()
+                    case "Wed":
+                        wednesdayLabel.textColor = UIColor.redColor()
+                    case "Thu":
+                        thursdayLabel.textColor = UIColor.redColor()
+                    case "Fri":
+                        fridayLabel.textColor = UIColor.redColor()
+                    case "Sat":
+                        saturdayLabel.textColor = UIColor.redColor()
+                    case "Sun":
+                        sundayLabel.textColor = UIColor.redColor()
+                    default:
+                        println("unknown day \(day)")
+                }
+                
+            }
         }
+        streetNameLabel.text = polyline.annotation
+        println("\(polyline.id): \(streetNameLabel.text)")
     }
     
     func MKMapRectForCoordinateRegion(region: MKCoordinateRegion) -> MKMapRect {
@@ -301,6 +364,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     }
     
     func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
+        resetCalendarOverlay()
         let maxDistance = findMaxDimensionsOfMap(mapView)
         if(maxDistance < 1000) {
             lookupSweepingForLocation(mapView.centerCoordinate, maxDistance: maxDistance)
