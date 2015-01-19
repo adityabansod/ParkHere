@@ -10,7 +10,7 @@ import UIKit
 import MapKit
 import CoreLocation
 
-class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate, UIGestureRecognizerDelegate {
+class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate, UIGestureRecognizerDelegate {
 
     var networkRequestPending:Bool = false
     var locationManager:CLLocationManager?
@@ -24,10 +24,11 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     @IBOutlet weak var fridayLabel: UILabel!
     @IBOutlet weak var saturdayLabel: UILabel!
     @IBOutlet weak var streetNameLabel: UILabel!
+    @IBOutlet weak var loadingIndicator: UIActivityIndicatorView!
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         setupLocationService()
     }
     
@@ -64,110 +65,22 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         }
         
 //        #if DEBUG
-//            let url = NSURL(string: "http://192.168.1.186:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
+            let url = NSURL(string: "http://192.168.1.186:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
 //       #else
-           let url = NSURL(string: "https://obscure-journey-3692.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
+//           let url = NSURL(string: "https://parkhereapp.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
 //        #endif
-        
-        var jsonError: NSError?
         
         let tap = UITapGestureRecognizer(target: self, action: Selector("handleOverlayTap:"))
         tap.delegate = self
         mapView.addGestureRecognizer(tap)
         
         let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
-            if let results = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &jsonError) as? NSArray {
-                self.networkRequestPending = false
-                for result in results {
-//                    print("found a result with ")
-//                    println(result.valueForKeyPath("properties.Regulation") as String)
-                    let geometryType = result.valueForKeyPath("geometry.type") as String
-                    let coordinates = result.valueForKeyPath("geometry.coordinates") as NSArray
-                    let id = result.valueForKeyPath("_id") as String
-                    
-                    if geometryType == "LineString" {
-                        var linepath:[CLLocationCoordinate2D] = []
-                        for cord in coordinates {
-                            let c = CLLocationCoordinate2DMake(cord[1] as CLLocationDegrees, cord[0] as CLLocationDegrees)
-                            linepath.append(c)
-                        }
-                        let polyline = PolylineWithAnnotations(coordinates: &linepath, count: linepath.count)
-                        let centerJson = result.valueForKeyPath("centerpoint") as NSArray
-                        
-                        polyline.centerpoint = CLLocationCoordinate2DMake(centerJson[0] as CLLocationDegrees, centerJson[1] as CLLocationDegrees)
-                        
-                        if let streetName = result.valueForKeyPath("street") as? String {
-                            polyline.street = streetName
-                        } else {
-                            polyline.street = "Unknown"
-                        }
-                        
-                        if let sweepings = result.valueForKeyPath("sweepings") as? NSArray {
-                            if sweepings.count > 0 {
-                                polyline.sweepings = sweepings
-                            }
-                        }
-                        
-                        
-                        let regs = result.valueForKeyPath("properties.Regulation") as String;
-                        switch regs {
-                        case "Unregulated":
-                            polyline.annotation += "There are no permits or meters on this block."
-                        case "RPP":
-                            if let permitArea = result.valueForKeyPath("properties.PermitArea") as? String {
-                                if let permitHours = result.valueForKeyPath("properties.Hours") as? String {
-                                    if let permitDays = result.valueForKeyPath("properties.Days") as? String {
-                                        if let permitHourLimit = result.valueForKeyPath("properties.HrLimit") as? Int {
-                                            polyline.annotation += "There is a \(permitHourLimit) hour limit here unless you have a type \(permitArea) permit. This is enforced \(permitDays) \(permitHours)."
-                                        }
-                                    }
-                                }
-                            } else {
-                                polyline.annotation += "This block requires a residential parking permit."
-                            }
-                        case "Time limited": // TODO: ollapse this logic with RPP. it's the same except it has no permit area
-                            if let permitHours = result.valueForKeyPath("properties.Hours") as? String {
-                                if let permitDays = result.valueForKeyPath("properties.Days") as? String {
-                                    if let permitHourLimit = result.valueForKeyPath("properties.HrLimit") as? Int {
-                                        polyline.annotation += "There is a \(permitHourLimit) hour limit here. This is enforced \(permitDays) \(permitHours)."
-                                    }
-                                }
-                            } else {
-                                polyline.annotation += "This block requires a residential parking permit."
-                            }
-                            
-                        case "Metered":
-                            polyline.annotation += "This block has parking meters."
-                        default:
-                            polyline.annotation += regs
-                        }
-                        
-                        polyline.annotation = polyline.annotation.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
-                        polyline.id = id
-                        
-                        dispatch_async(dispatch_get_main_queue()) {
-                            // this is here since adding the overlay is async, therefore there are timing issues
-                            // between the main thread adding events faster than they exist in self.mapView.overlays
-                            // since dispatch_async is a queue, we can check here to ensure we're not double adding things
-                            if let overlayCollection = self.mapView.overlays as? [PolylineWithAnnotations] {
-                                for overlay in overlayCollection {
-                                    if id == (overlay as PolylineWithAnnotations).id {
-                                        return
-                                    }
-                                }
-                            }
-                            self.mapView.addOverlay(polyline, level: MKOverlayLevel.AboveRoads)
-                        }
-                    } else {
-                        println("found geometry other than a linestring, bailing");
-                    }
-                    
-                }
-            }
-            
+            self.processRegulationsData(data)
         }
         task.resume()
         networkRequestPending = true
+        loadingIndicator.startAnimating()
+
 
     }
     
@@ -175,10 +88,102 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
         lookupSweepingForLocation(coordinate, maxDistance: 150)
     }
     
+    func processRegulationsData(data: NSData) {
+        self.clearNetworkPendingFlag()
+
+        var jsonError: NSError?
+        if let results = NSJSONSerialization.JSONObjectWithData(data, options: nil, error: &jsonError) as? NSArray {
+            for result in results {
+                let geometryType = result.valueForKeyPath("geometry.type") as String
+                let coordinates = result.valueForKeyPath("geometry.coordinates") as NSArray
+                let id = result.valueForKeyPath("_id") as String
+                
+                if geometryType == "LineString" {
+                    var linepath:[CLLocationCoordinate2D] = []
+                    for cord in coordinates {
+                        let c = CLLocationCoordinate2DMake(cord[1] as CLLocationDegrees, cord[0] as CLLocationDegrees)
+                        linepath.append(c)
+                    }
+                    let polyline = PolylineWithAnnotations(coordinates: &linepath, count: linepath.count)
+                    let centerJson = result.valueForKeyPath("centerpoint") as NSArray
+                    
+                    polyline.centerpoint = CLLocationCoordinate2DMake(centerJson[0] as CLLocationDegrees, centerJson[1] as CLLocationDegrees)
+                    
+                    if let streetName = result.valueForKeyPath("street") as? String {
+                        polyline.street = streetName
+                    } else {
+                        polyline.street = "Unknown"
+                    }
+                    
+                    if let sweepings = result.valueForKeyPath("sweepings") as? NSArray {
+                        if sweepings.count > 0 {
+                            polyline.sweepings = sweepings
+                        }
+                    }
+                    
+                    
+                    let regs = result.valueForKeyPath("properties.Regulation") as String;
+                    switch regs {
+                    case "Unregulated":
+                        polyline.annotation += "There are no permits or meters on this block."
+                        polyline.type = .None
+                    case "RPP":
+                        if let permitArea = result.valueForKeyPath("properties.PermitArea") as? String {
+                            if let permitHours = result.valueForKeyPath("properties.Hours") as? String {
+                                if let permitDays = result.valueForKeyPath("properties.Days") as? String {
+                                    if let permitHourLimit = result.valueForKeyPath("properties.HrLimit") as? Int {
+                                        polyline.annotation += "There is a \(permitHourLimit) hour limit here unless you have a typfe \(permitArea) permit. This is enforced \(permitDays) \(permitHours)."
+                                    }
+                                }
+                            }
+                        } else {
+                            polyline.annotation += "This block requires a residential parking permit."
+                        }
+                        polyline.type = .ParkingPermit
+                    case "Time limited": // TODO: ollapse this logic with RPP. it's the same except it has no permit area
+                        if let permitHours = result.valueForKeyPath("properties.Hours") as? String {
+                            if let permitDays = result.valueForKeyPath("properties.Days") as? String {
+                                if let permitHourLimit = result.valueForKeyPath("properties.HrLimit") as? Int {
+                                    polyline.annotation += "There is a \(permitHourLimit) hour limit here. This is enforced \(permitDays) \(permitHours)."
+                                }
+                            }
+                        } else {
+                            polyline.annotation += "This block requires a residential parking permit."
+                        }
+                        polyline.type = .TimeLimited
+                    case "Metered":
+                        polyline.annotation += "This block has parking meters."
+                        polyline.type = .ParkingMeters
+                    default:
+                        polyline.annotation += regs
+                        polyline.type = .Unknown
+                    }
+                    
+                    polyline.annotation = polyline.annotation.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+                    polyline.id = id
+                    
+                    dispatch_async(dispatch_get_main_queue()) {
+                        // this is here since adding the overlay is async, therefore there are timing issues
+                        // between the main thread adding events faster than they exist in self.mapView.overlays
+                        // since dispatch_async is a queue, we can check here to ensure we're not double adding things
+                        if let overlayCollection = self.mapView.overlays as? [PolylineWithAnnotations] {
+                            if (overlayCollection.filter { $0.id == id }).count > 0 {
+                                return
+                            }
+                        }
+                        self.mapView.addOverlay(polyline, level: MKOverlayLevel.AboveRoads)
+                    }
+                } else {
+                    println("found geometry other than a linestring, bailing");
+                }
+                
+            }
+        }
+    }
+    
     func shouldLookupSweeping() -> Bool {
         if networkRequestPending {
-            println("skipping network request")
-            NSTimer.scheduledTimerWithTimeInterval(0.5, target: self, selector: "clearNetworkPendingFlag", userInfo: nil, repeats: false)
+            NSTimer.scheduledTimerWithTimeInterval(0.1, target: self, selector: "clearNetworkPendingFlag", userInfo: nil, repeats: false)
             return false
         } else {
             return true
@@ -187,6 +192,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
     
     func clearNetworkPendingFlag() {
         networkRequestPending = false
+        loadingIndicator.stopAnimating()
     }
     
     func handleOverlayTap(tap: UITapGestureRecognizer) {
@@ -376,15 +382,19 @@ class ViewController: UIViewController, CLLocationManagerDelegate, MKMapViewDele
             let poly = overlay as PolylineWithAnnotations
             
             var polylineRenderer = MKPolylineRenderer(overlay: poly)
-            if poly.hasAnyRestrictions {
-                polylineRenderer.strokeColor = UIColor.redColor()
+            if poly.hasSweepingsToday {
+                polylineRenderer.strokeColor = UIColor.yellowColor().colorWithAlphaComponent(0.65)
+            } else if poly.hasSweepingsToday && poly.hasAnyRestrictions {
+                polylineRenderer.strokeColor = UIColor.redColor().colorWithAlphaComponent(0.5)
             } else if poly.hasSomeRestrictions {
-                polylineRenderer.strokeColor = UIColor.yellowColor()
+                polylineRenderer.strokeColor = UIColor.greenColor().colorWithAlphaComponent(0.5)
             } else {
-                polylineRenderer.strokeColor = UIColor.greenColor()
+                polylineRenderer.strokeColor = UIColor.greenColor().colorWithAlphaComponent(0.8)
             }
             
             polylineRenderer.lineWidth = 4
+            polylineRenderer.lineCap = kCGLineCapSquare
+            polylineRenderer.lineDashPhase = 15
             return polylineRenderer
         } else {
             return nil

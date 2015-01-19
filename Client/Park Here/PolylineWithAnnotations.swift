@@ -9,12 +9,17 @@
 import UIKit
 import MapKit
 
+enum RegulationType {
+    case ParkingPermit, TimeLimited, ParkingMeters, None, Unknown
+}
+
 class PolylineWithAnnotations: MKPolyline {
     var annotation:String = ""
     var id:String = ""
     var street:String = ""
     var centerpoint:CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: 0, longitude: 0)
     var sweepings:NSArray = []
+    var type:RegulationType = .None
     var hasAnyRestrictions:Bool {
         get {
             // clearly this is not the best solution since it depends on the 
@@ -28,5 +33,60 @@ class PolylineWithAnnotations: MKPolyline {
             return sweepings.count > 0 || annotation != ""
         }
     }
+    
+    func getToday() -> Int {
+        let calendar = NSCalendar.currentCalendar()
+        let components = calendar.components(.WeekdayCalendarUnit, fromDate: NSDate())
+        return components.weekday
+    }
+    
+    var hasSweepingsToday:Bool {
+        get {
+            var sweepingToday:Bool = false
+            for sweeping in sweepings {
+                if determineIfSweepingApplies(sweeping as NSDictionary) {
+                    sweepingToday = true
+                }
+            }
+            return sweepingToday
+        }
+    }
+        
+    func determineIfSweepingApplies(sweeping: NSDictionary) -> Bool {
+        let today = getToday()
+        if let weekday = sweeping.valueForKey("weekday") as? String {
+            switch(weekday) {
+            case "Sun":
+                if today == 1 { return true }
+                break
+            case "Mon":
+                if today == 2 { return true }
+                break
+            case "Tues":
+                if today == 3 { return true }
+                break
+            case "Wed":
+                if today == 4 { return true }
+                break
+            case "Thu":
+                if today == 5 { return true }
+                break
+            case "Fri":
+                if today == 6 { return true }
+                break
+            case "Sat":
+                if today == 7 { return true }
+                break
+            case "Holiday":
+                return false
+            default:
+                println("wtf")
+                return false
+            }
+        }
+        return false
+    }
+    
+    
     
 }

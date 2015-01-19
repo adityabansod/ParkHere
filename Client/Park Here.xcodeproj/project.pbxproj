@@ -8,8 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		FE1B5FCB1A0D97F700904ECB /* PolylineWithAnnotations.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE1B5FCA1A0D97F700904ECB /* PolylineWithAnnotations.swift */; };
+		FE6056BE1A6B883600A6D222 /* IntroContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE6056BD1A6B883600A6D222 /* IntroContentViewController.swift */; };
+		FE6056C01A6B8AA300A6D222 /* IntroViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE6056BF1A6B8AA300A6D222 /* IntroViewController.swift */; };
 		FE6863A01A0BF7FC0055EDE0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE68639F1A0BF7FC0055EDE0 /* AppDelegate.swift */; };
-		FE6863A21A0BF7FC0055EDE0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE6863A11A0BF7FC0055EDE0 /* ViewController.swift */; };
+		FE6863A21A0BF7FC0055EDE0 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE6863A11A0BF7FC0055EDE0 /* MapViewController.swift */; };
 		FE6863A51A0BF7FC0055EDE0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FE6863A31A0BF7FC0055EDE0 /* Main.storyboard */; };
 		FE6863A71A0BF7FC0055EDE0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FE6863A61A0BF7FC0055EDE0 /* Images.xcassets */; };
 		FE6863AA1A0BF7FC0055EDE0 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = FE6863A81A0BF7FC0055EDE0 /* LaunchScreen.xib */; };
@@ -30,10 +32,12 @@
 
 /* Begin PBXFileReference section */
 		FE1B5FCA1A0D97F700904ECB /* PolylineWithAnnotations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PolylineWithAnnotations.swift; sourceTree = "<group>"; };
+		FE6056BD1A6B883600A6D222 /* IntroContentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroContentViewController.swift; sourceTree = "<group>"; };
+		FE6056BF1A6B8AA300A6D222 /* IntroViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroViewController.swift; sourceTree = "<group>"; };
 		FE68639A1A0BF7FC0055EDE0 /* Park Here.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Park Here.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE68639E1A0BF7FC0055EDE0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FE68639F1A0BF7FC0055EDE0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		FE6863A11A0BF7FC0055EDE0 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		FE6863A11A0BF7FC0055EDE0 /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		FE6863A41A0BF7FC0055EDE0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		FE6863A61A0BF7FC0055EDE0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		FE6863A91A0BF7FC0055EDE0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
@@ -64,6 +68,31 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		FE1F6F1B1A6C8F6000B75AAA /* Support Classes */ = {
+			isa = PBXGroup;
+			children = (
+				FE1B5FCA1A0D97F700904ECB /* PolylineWithAnnotations.swift */,
+			);
+			name = "Support Classes";
+			sourceTree = "<group>";
+		};
+		FE1F6F1C1A6C8F7900B75AAA /* Intro Views */ = {
+			isa = PBXGroup;
+			children = (
+				FE6056BF1A6B8AA300A6D222 /* IntroViewController.swift */,
+				FE6056BD1A6B883600A6D222 /* IntroContentViewController.swift */,
+			);
+			name = "Intro Views";
+			sourceTree = "<group>";
+		};
+		FE1F6F1D1A6C8F9D00B75AAA /* Map View */ = {
+			isa = PBXGroup;
+			children = (
+				FE6863A11A0BF7FC0055EDE0 /* MapViewController.swift */,
+			);
+			name = "Map View";
+			sourceTree = "<group>";
+		};
 		FE6863911A0BF7FC0055EDE0 = {
 			isa = PBXGroup;
 			children = (
@@ -88,12 +117,13 @@
 			isa = PBXGroup;
 			children = (
 				FE68639F1A0BF7FC0055EDE0 /* AppDelegate.swift */,
-				FE6863A11A0BF7FC0055EDE0 /* ViewController.swift */,
+				FE1F6F1D1A6C8F9D00B75AAA /* Map View */,
 				FE6863A31A0BF7FC0055EDE0 /* Main.storyboard */,
+				FE1F6F1C1A6C8F7900B75AAA /* Intro Views */,
 				FE6863A61A0BF7FC0055EDE0 /* Images.xcassets */,
 				FE6863A81A0BF7FC0055EDE0 /* LaunchScreen.xib */,
 				FE68639D1A0BF7FC0055EDE0 /* Supporting Files */,
-				FE1B5FCA1A0D97F700904ECB /* PolylineWithAnnotations.swift */,
+				FE1F6F1B1A6C8F6000B75AAA /* Support Classes */,
 			);
 			path = "Park Here";
 			sourceTree = "<group>";
@@ -228,8 +258,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FE6056C01A6B8AA300A6D222 /* IntroViewController.swift in Sources */,
 				FE1B5FCB1A0D97F700904ECB /* PolylineWithAnnotations.swift in Sources */,
-				FE6863A21A0BF7FC0055EDE0 /* ViewController.swift in Sources */,
+				FE6056BE1A6B883600A6D222 /* IntroContentViewController.swift in Sources */,
+				FE6863A21A0BF7FC0055EDE0 /* MapViewController.swift in Sources */,
 				FE6863A01A0BF7FC0055EDE0 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

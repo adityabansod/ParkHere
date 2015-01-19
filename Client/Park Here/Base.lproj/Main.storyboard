@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="vXZ-lx-hvc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="Kkh-KA-mAI">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
         <capability name="Alignment constraints to the first baseline" minToolsVersion="6.0"/>
@@ -7,10 +7,39 @@
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Page View Controller-->
+        <scene sceneID="ABW-lY-hW2">
+            <objects>
+                <pageViewController storyboardIdentifier="IntroPageViewController" autoresizesArchivedViewToFullSize="NO" transitionStyle="scroll" navigationOrientation="horizontal" spineLocation="none" id="oG2-Dh-R49" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Yav-yJ-FZE" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="501" y="1512"/>
+        </scene>
+        <!--Intro View Controller-->
+        <scene sceneID="qbc-Gz-oae">
+            <objects>
+                <viewController id="Kkh-KA-mAI" customClass="IntroViewController" customModule="Park_Here" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="TRz-4N-ceh"/>
+                        <viewControllerLayoutGuide type="bottom" id="d0y-iq-zGM"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="mUX-Tl-aF4">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <connections>
+                        <segue destination="vXZ-lx-hvc" kind="show" identifier="IntroViewToMapViewSegue" id="YKh-8f-OOX"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="VIk-IA-6R1" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-227" y="1180"/>
+        </scene>
+        <!--Map View Controller-->
         <scene sceneID="ufC-wZ-h7g">
             <objects>
-                <viewController id="vXZ-lx-hvc" customClass="ViewController" customModule="Park_Here" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="MapViewController" id="vXZ-lx-hvc" customClass="MapViewController" customModule="Park_Here" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="jyV-Pf-zRb"/>
                         <viewControllerLayoutGuide type="bottom" id="2fi-mo-0CV"/>
@@ -109,6 +138,9 @@
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="fiz-I0-DUQ">
+                                <rect key="frame" x="290" y="300" width="20" height="20"/>
+                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
@@ -137,11 +169,14 @@
                             <constraint firstItem="inX-NB-SkW" firstAttribute="bottom" secondItem="2fi-mo-0CV" secondAttribute="top" id="qwL-by-KzQ"/>
                             <constraint firstItem="BSD-be-Zj1" firstAttribute="trailing" secondItem="inX-NB-SkW" secondAttribute="trailing" id="wDX-Yb-cqK"/>
                             <constraint firstItem="ZD3-en-pXo" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" constant="20" id="wIu-dD-h9p"/>
+                            <constraint firstAttribute="centerX" secondItem="fiz-I0-DUQ" secondAttribute="centerX" id="x7m-uy-8XW"/>
                             <constraint firstItem="VRO-rd-1Gy" firstAttribute="leading" secondItem="suL-nr-cZf" secondAttribute="trailing" constant="8" symbolic="YES" id="yIY-eR-9GI"/>
+                            <constraint firstAttribute="centerY" secondItem="fiz-I0-DUQ" secondAttribute="centerY" id="zl4-Pc-xyh"/>
                         </constraints>
                     </view>
                     <connections>
                         <outlet property="fridayLabel" destination="Dyy-rE-ICn" id="sQU-u1-XNg"/>
+                        <outlet property="loadingIndicator" destination="fiz-I0-DUQ" id="Lad-hs-0G9"/>
                         <outlet property="mapView" destination="inX-NB-SkW" id="g44-3x-Inm"/>
                         <outlet property="mondayLabel" destination="VRO-rd-1Gy" id="f3Z-LK-aWs"/>
                         <outlet property="saturdayLabel" destination="jZq-el-Gyl" id="ohg-NY-vYt"/>
@@ -154,7 +189,40 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="329" y="388"/>
+            <point key="canvasLocation" x="777" y="38"/>
+        </scene>
+        <!--Intro Content View Controller-->
+        <scene sceneID="mTm-lu-Zwp">
+            <objects>
+                <viewController storyboardIdentifier="IntroContentViewController" id="Bzv-xd-Asy" customClass="IntroContentViewController" customModule="Park_Here" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="WjC-MR-3uT"/>
+                        <viewControllerLayoutGuide type="bottom" id="5rG-eT-Qnf"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="eCK-5v-4ev">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hWl-1L-dvo">
+                                <rect key="frame" x="278" y="291" width="42" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="centerX" secondItem="hWl-1L-dvo" secondAttribute="centerX" id="j3x-Nb-yOZ"/>
+                            <constraint firstAttribute="centerY" secondItem="hWl-1L-dvo" secondAttribute="centerY" id="n7R-4S-RZN"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="label" destination="hWl-1L-dvo" id="Dgf-fD-lK8"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="DyA-fv-8nK" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="647" y="1212"/>
         </scene>
     </scenes>
 </document>
