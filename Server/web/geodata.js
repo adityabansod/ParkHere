@@ -66,7 +66,7 @@ function queryForStreetSweeping(blockfaceResult, callbackFn) {
             (function(err, res) {
                 var sweepings =  res;
 
-                // console.log('filtered ' + sweepings.length + ' of ' + res.length + ' sweeping results for ' + this._id);
+                console.log('filtered ' + sweepings.length + ' of ' + res.length + ' sweeping results for ' + this._id);
                 if(sweepings.length > 0) {
                     /*
                        3. hokay. since we searched for sweeping locations based on

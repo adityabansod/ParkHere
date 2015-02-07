@@ -24,6 +24,9 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     @IBOutlet weak var fridayLabel: UILabel!
     @IBOutlet weak var saturdayLabel: UILabel!
     @IBOutlet weak var streetNameLabel: UILabel!
+    @IBOutlet weak var opacityUnderlay: UIView!
+    var selectedPolyline:PolylineWithAnnotations?
+    var selectedPolylineOldColor:UIColor?
     @IBOutlet weak var loadingIndicator: UIActivityIndicatorView!
     
 
@@ -64,11 +67,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
             return
         }
         
-//        #if DEBUG
-            let url = NSURL(string: "http://192.168.1.186:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
-//       #else
-//           let url = NSURL(string: "https://parkhereapp.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
-//        #endif
+//        let url = NSURL(string: "http://192.168.2.2:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
+        let url = NSURL(string: "https://parkhereapp.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
         
         let tap = UITapGestureRecognizer(target: self, action: Selector("handleOverlayTap:"))
         tap.delegate = self
@@ -132,7 +132,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
                             if let permitHours = result.valueForKeyPath("properties.Hours") as? String {
                                 if let permitDays = result.valueForKeyPath("properties.Days") as? String {
                                     if let permitHourLimit = result.valueForKeyPath("properties.HrLimit") as? Int {
-                                        polyline.annotation += "There is a \(permitHourLimit) hour limit here unless you have a typfe \(permitArea) permit. This is enforced \(permitDays) \(permitHours)."
+                                        polyline.annotation += "There is a \(permitHourLimit) hour limit here unless you have a type \(permitArea) permit. This is enforced \(permitDays) \(permitHours)."
                                     }
                                 }
                             }
@@ -241,6 +241,11 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
                 
                 messages += polyline.annotation + " "
                 println("Creating alert for \(polyline.id) at distance \(dist)")
+                selectedPolyline = polyline
+                selectedPolylineOldColor = polyline.renderer.strokeColor
+                polyline.renderer.strokeColor = UIColor.brownColor()
+                
+                
             }
             
 //            if messages != "" {
@@ -258,6 +263,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         saturdayLabel.hidden = true
         sundayLabel.hidden = true
         streetNameLabel.hidden = true
+        opacityUnderlay.hidden = true
         
         mondayLabel.textColor = UIColor.blackColor()
         tuesdayLabel.textColor = UIColor.blackColor()
@@ -266,6 +272,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         fridayLabel.textColor = UIColor.blackColor()
         saturdayLabel.textColor = UIColor.blackColor()
         sundayLabel.textColor = UIColor.blackColor()
+        selectedPolyline?.renderer.strokeColor = selectedPolylineOldColor
     }
     
     func updateCalendarOverlay(polyline: PolylineWithAnnotations) {
@@ -279,6 +286,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         saturdayLabel.hidden = false
         sundayLabel.hidden = false
         streetNameLabel.hidden = false
+        opacityUnderlay.hidden = false
         
         for sweeping in polyline.sweepings {
             if let day = sweeping.valueForKeyPath("weekday") as? String {
@@ -382,6 +390,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
             let poly = overlay as PolylineWithAnnotations
             
             var polylineRenderer = MKPolylineRenderer(overlay: poly)
+            poly.renderer = polylineRenderer
             if poly.hasSweepingsToday {
                 polylineRenderer.strokeColor = UIColor.yellowColor().colorWithAlphaComponent(0.65)
             } else if poly.hasSweepingsToday && poly.hasAnyRestrictions {

@@ -10,15 +10,19 @@ import UIKit
 
 class IntroContentViewController: UIViewController {
 
-    @IBOutlet weak var label: UILabel!
+    
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var footerLabel: UILabel!
+    
     var pageIndex = 0
-    var labelText = ""
+    var titleText = ""
+    var footerText = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.label.text = labelText
-        // Do any additional setup after loading the view.
+        self.titleLabel.text = titleText
+        self.footerLabel.text = footerText
     }
 
     override func didReceiveMemoryWarning() {

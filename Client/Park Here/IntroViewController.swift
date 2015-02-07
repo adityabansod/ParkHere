@@ -15,21 +15,62 @@ class IntroViewController: UIPageViewController, UIPageViewControllerDataSource 
     }
     
     var pageTitles:[String] =
+    ["Welcome to Park Here! The easiest way to avoid parking tickets in San Francisco.",
+    "Tap on a street name to view details for any block.",
+    ""]
     
-    ["Welcome to Park Here",
-    "Find parking rules, street sweeping, meters and more all across SF",
+    var pageFooter:[String] =
+    ["",
+    "Swipe right to get started",
     ""]
     
     var introPageViewController:UIPageViewController = UIPageViewController()
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if shouldRunIntro() {
+            setupIntro()
+        } else {
+//            let mapview = self.storyboard?.instantiateViewControllerWithIdentifier("MapViewController") as MapViewController
+//            self.navigationController?.pushViewController(mapview, animated: false)
+//            self.view.addSubview(mapview.view)
+//            mapview.viewDidLoad()
+            
+//            ins
+//            self.performSegueWithIdentifier("IntroViewToMapViewSegue", sender: self)
 
+        }
+        
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        if !shouldRunIntro() {
+            self.view.hidden = true
+        }
+    }
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(true)
+        if !shouldRunIntro() {
+            self.performSegueWithIdentifier("IntroViewToMapViewSegue", sender: self)
+        }
+    }
+
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
+    }
+    
+    func setupPageControls() {
         let pageControl = UIPageControl.appearance()
         pageControl.pageIndicatorTintColor = UIColor.lightGrayColor()
         pageControl.currentPageIndicatorTintColor = UIColor.blackColor()
         pageControl.backgroundColor = UIColor.whiteColor()
-
+    }
+    
+    func setupIntro() {
+        
+        setupPageControls()
         
         introPageViewController = self.storyboard?.instantiateViewControllerWithIdentifier("IntroPageViewController") as UIPageViewController
         introPageViewController.dataSource = self;
@@ -41,12 +82,10 @@ class IntroViewController: UIPageViewController, UIPageViewControllerDataSource 
         addChildViewController(introPageViewController)
         view.addSubview(introPageViewController.view)
         introPageViewController.didMoveToParentViewController(self)
-        
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    func shouldRunIntro() -> Bool {
+        return true
     }
     
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
@@ -81,7 +120,9 @@ class IntroViewController: UIPageViewController, UIPageViewControllerDataSource 
         }
         
         let content = self.storyboard?.instantiateViewControllerWithIdentifier("IntroContentViewController") as IntroContentViewController
-        content.labelText = pageTitles[index]
+        content.titleText = pageTitles[index]
+        content.footerText = pageFooter[index]
+        
         content.pageIndex = index
         return content
     }
