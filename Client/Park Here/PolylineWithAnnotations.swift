@@ -88,7 +88,4 @@ class PolylineWithAnnotations: MKPolyline {
         }
         return false
     }
-    
-    
-    
 }

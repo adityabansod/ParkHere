@@ -17,12 +17,9 @@ class IntroViewController: UIPageViewController, UIPageViewControllerDataSource 
     var pageTitles:[String] =
     ["Welcome to Park Here! The easiest way to avoid parking tickets in San Francisco.",
     "Tap on a street name to view details for any block.",
-    ""]
+    "Get started now!"]
     
-    var pageFooter:[String] =
-    ["",
-    "Swipe right to get started",
-    ""]
+    
     
     var introPageViewController:UIPageViewController = UIPageViewController()
 
@@ -38,7 +35,7 @@ class IntroViewController: UIPageViewController, UIPageViewControllerDataSource 
 //            mapview.viewDidLoad()
             
 //            ins
-//            self.performSegueWithIdentifier("IntroViewToMapViewSegue", sender: self)
+            self.performSegueWithIdentifier("IntroViewToMapViewSegue", sender: self)
 
         }
         
@@ -85,7 +82,7 @@ class IntroViewController: UIPageViewController, UIPageViewControllerDataSource 
     }
     
     func shouldRunIntro() -> Bool {
-        return true
+        return false
     }
     
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
@@ -106,11 +103,11 @@ class IntroViewController: UIPageViewController, UIPageViewControllerDataSource 
         index++
         
         // if we're at the end of the intro, segue to the map view
-        if index == self.pageTitles.count {
-            self.performSegueWithIdentifier("IntroViewToMapViewSegue", sender: self)
-            return nil
-        }
-        
+//        if index == self.pageTitles.count {
+//            self.performSegueWithIdentifier("IntroViewToMapViewSegue", sender: self)
+//            return nil
+//        }
+//        
         return viewControllerForIndex(index)
     }
     
@@ -121,7 +118,6 @@ class IntroViewController: UIPageViewController, UIPageViewControllerDataSource 
         
         let content = self.storyboard?.instantiateViewControllerWithIdentifier("IntroContentViewController") as IntroContentViewController
         content.titleText = pageTitles[index]
-        content.footerText = pageFooter[index]
         
         content.pageIndex = index
         return content
