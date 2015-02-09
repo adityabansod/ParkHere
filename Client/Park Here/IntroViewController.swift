@@ -35,7 +35,7 @@ class IntroViewController: UIPageViewController, UIPageViewControllerDataSource 
 //            mapview.viewDidLoad()
             
 //            ins
-//            self.performSegueWithIdentifier("IntroViewToMapViewSegue", sender: self)
+            self.performSegueWithIdentifier("IntroViewToMapViewSegue", sender: self)
 
         }
         
@@ -82,7 +82,7 @@ class IntroViewController: UIPageViewController, UIPageViewControllerDataSource 
     }
     
     func shouldRunIntro() -> Bool {
-        return true
+        return false
     }
     
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {
