@@ -12,17 +12,19 @@ class IntroContentViewController: UIViewController {
 
     
     @IBOutlet weak var titleLabel: UILabel!
-    @IBOutlet weak var footerLabel: UILabel!
+    
+    @IBAction func cancelButton(sender: UIButton) {
+        // this is a little silly -- but, IntroContentVC is inside of PageVC, which is inside of IntroVC
+        self.parentViewController?.parentViewController?.performSegueWithIdentifier("IntroViewToMapViewSegue", sender: self)
+    }
     
     var pageIndex = 0
     var titleText = ""
-    var footerText = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.titleLabel.text = titleText
-        self.footerLabel.text = footerText
     }
 
     override func didReceiveMemoryWarning() {
