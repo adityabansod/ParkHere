@@ -173,7 +173,7 @@
                                     <rect key="frame" x="16" y="323" width="88" height="69"/>
                                 </variation>
                             </label>
-                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" misplaced="YES" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="fiz-I0-DUQ">
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="fiz-I0-DUQ">
                                 <rect key="frame" x="290" y="300" width="20" height="20"/>
                             </activityIndicatorView>
                         </subviews>
@@ -185,11 +185,11 @@
                             <constraint firstItem="inX-NB-SkW" firstAttribute="bottom" secondItem="2fi-mo-0CV" secondAttribute="top" id="J8d-hf-pnG"/>
                             <constraint firstItem="BSD-be-Zj1" firstAttribute="top" secondItem="inX-NB-SkW" secondAttribute="top" id="Vp0-3w-fU7"/>
                             <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="zc2-ws-HFp" secondAttribute="bottom" constant="8" symbolic="YES" id="WNa-Uj-2Wx"/>
-                            <constraint firstItem="zc2-ws-HFp" firstAttribute="centerX" secondItem="fiz-I0-DUQ" secondAttribute="centerX" id="ZSi-o2-Z7t"/>
                             <constraint firstItem="BSD-be-Zj1" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="b5v-CD-CGn"/>
                             <constraint firstItem="inX-NB-SkW" firstAttribute="trailing" secondItem="BSD-be-Zj1" secondAttribute="trailing" id="c0I-aD-IIb"/>
                             <constraint firstItem="zc2-ws-HFp" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" id="f2j-Xl-TRv"/>
-                            <constraint firstItem="inX-NB-SkW" firstAttribute="centerY" secondItem="fiz-I0-DUQ" secondAttribute="centerY" id="roZ-9o-wk8"/>
+                            <constraint firstAttribute="centerY" secondItem="fiz-I0-DUQ" secondAttribute="centerY" constant="-10" id="m6t-Ey-9pX"/>
+                            <constraint firstAttribute="centerX" secondItem="fiz-I0-DUQ" secondAttribute="centerX" id="qZ1-AI-tZh"/>
                         </constraints>
                     </view>
                     <connections>

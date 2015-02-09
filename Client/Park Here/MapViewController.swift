@@ -212,7 +212,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
             for overlay in overlayCollection {
                 let polygon = overlay as PolylineWithAnnotations
                 if(polygon.intersectsMapRect(mapRect)) {
-                    let dist = wgs84distance(tapCoordinate, loc2: polygon.centerpoint)
+                    let dist = Geospatial.wgs84distance(tapCoordinate, loc2: polygon.centerpoint)
                     
                     // find the closest match
                     if dist < closestDistance {
@@ -245,12 +245,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
                 selectedPolylineOldColor = polyline.renderer.strokeColor
                 polyline.renderer.strokeColor = UIColor.brownColor()
                 
-                
             }
-            
-//            if messages != "" {
-//                createAlert(title, message: messages)
-//            }
         }
     }
     
@@ -294,7 +289,6 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
                     case "Mon":
                         mondayLabel.textColor = UIColor.redColor()
                     case "Tues":
-                        println("found round \(tuesdayLabel.textColor) + \(tuesdayLabel.text)")
                         tuesdayLabel.textColor = UIColor.redColor()
                     case "Wed":
                         wednesdayLabel.textColor = UIColor.redColor()
@@ -313,6 +307,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
             }
         }
         streetNameLabel.text = polyline.annotation
+        
+        
         println("\(polyline.id): \(streetNameLabel.text)")
     }
     
@@ -345,41 +341,9 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         self.presentViewController(alert, animated: true, completion: nil)
     }
     
-    func findMaxDimensionsOfMap(mapView: MKMapView!) -> Int {
-        let span = mapView.region.span
-        let center = mapView.centerCoordinate
-        
-        let loc1 = CLLocation(latitude: center.latitude - span.latitudeDelta * 0.5, longitude: center.longitude)
-        let loc2 = CLLocation(latitude: center.latitude + span.latitudeDelta * 0.5, longitude: center.longitude)
-        
-        let metersInLatitude = loc1.distanceFromLocation(loc2)
-        
-        let loc3 = CLLocation(latitude: center.latitude, longitude: center.longitude - span.longitudeDelta * 0.5)
-        let loc4 = CLLocation(latitude: center.latitude, longitude: center.longitude + span.longitudeDelta * 0.5)
-        
-        let metersInLongitude = loc3.distanceFromLocation(loc4)
-        
-        return Int(max(metersInLatitude, metersInLongitude))
-    }
-    
-    func wgs84distance(loc1:CLLocationCoordinate2D, loc2:CLLocationCoordinate2D) -> Double {
-        
-        let radlat1 = M_PI * loc1.latitude/180;
-        let radlat2 = M_PI * loc2.latitude/180;
-        let radlon1 = M_PI * loc1.longitude/180;
-        let radlon2 = M_PI * loc2.longitude/180;
-        let theta = loc1.longitude - loc2.longitude;
-        let radtheta = M_PI * theta/180;
-        var dist = sin(radlat1) * sin(radlat2) + cos(radlat1) * cos(radlat2) * cos(radtheta);
-        dist = acos(dist);
-        dist = dist * 180/M_PI;
-        dist = dist * 60 * 1.1515;
-        return dist * 1.609344 * 1000;
-    }
-    
     func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
         resetCalendarOverlay()
-        let maxDistance = findMaxDimensionsOfMap(mapView)
+        let maxDistance = Geospatial.findMaxDimensionsOfMap(mapView)
         if(maxDistance < 1000) {
             lookupSweepingForLocation(mapView.centerCoordinate, maxDistance: maxDistance)
         }

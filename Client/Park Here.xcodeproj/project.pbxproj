@@ -18,6 +18,7 @@
 		FE6863B61A0BF7FC0055EDE0 /* Park_HereTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE6863B51A0BF7FC0055EDE0 /* Park_HereTests.swift */; };
 		FE6863C01A0BF8E10055EDE0 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE6863BF1A0BF8E10055EDE0 /* MapKit.framework */; };
 		FE6863C21A0BFD940055EDE0 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE6863C11A0BFD940055EDE0 /* CoreLocation.framework */; };
+		FEC97D691A88606700214D90 /* Geospatial.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEC97D681A88606700214D90 /* Geospatial.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +47,7 @@
 		FE6863B51A0BF7FC0055EDE0 /* Park_HereTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Park_HereTests.swift; sourceTree = "<group>"; };
 		FE6863BF1A0BF8E10055EDE0 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		FE6863C11A0BFD940055EDE0 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		FEC97D681A88606700214D90 /* Geospatial.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Geospatial.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				FE1B5FCA1A0D97F700904ECB /* PolylineWithAnnotations.swift */,
+				FEC97D681A88606700214D90 /* Geospatial.swift */,
 			);
 			name = "Support Classes";
 			sourceTree = "<group>";
@@ -258,6 +261,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FEC97D691A88606700214D90 /* Geospatial.swift in Sources */,
 				FE6056C01A6B8AA300A6D222 /* IntroViewController.swift in Sources */,
 				FE1B5FCB1A0D97F700904ECB /* PolylineWithAnnotations.swift in Sources */,
 				FE6056BE1A6B883600A6D222 /* IntroContentViewController.swift in Sources */,
