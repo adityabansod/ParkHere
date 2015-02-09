@@ -4,7 +4,8 @@
   "description": "Given a set of lat/lon, returns street sweeping rules for nearby blocks",
   "main": "app.js",
   "scripts": {
-    "test": "foreman start"
+    "test": "foreman start",
+    "start": "node app.js"
   },
   "repository": "",
   "author": "Aditya Bansod (@adityabansod, http://www.adityabansod.net)",
