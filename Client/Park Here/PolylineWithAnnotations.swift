@@ -47,43 +47,130 @@ class PolylineWithAnnotations: MKPolyline {
             var sweepingToday:Bool = false
             for sweeping in sweepings {
                 if determineIfSweepingApplies(sweeping as NSDictionary) {
-                    sweepingToday = true
+                    return true
                 }
             }
             return sweepingToday
         }
     }
-        
-    func determineIfSweepingApplies(sweeping: NSDictionary) -> Bool {
-        let today = getToday()
-        if let weekday = sweeping.valueForKey("weekday") as? String {
-            switch(weekday) {
+    
+    private func getHoursFromString(raw: String) -> Int {
+        return raw.componentsSeparatedByString(":")[0].toInt()!
+    }
+    
+    private func getMinutesFromString(raw: String) -> Int {
+        return raw.componentsSeparatedByString(":")[1].toInt()!
+    }
+    
+    private func convertDayToOrdinal(raw: String) -> Int {
+        switch(raw) {
             case "Sun":
-                if today == 1 { return true }
-                break
+                return 1
             case "Mon":
-                if today == 2 { return true }
-                break
+                return 2
             case "Tues":
-                if today == 3 { return true }
-                break
+                return 3
             case "Wed":
-                if today == 4 { return true }
-                break
+                return 4
             case "Thu":
-                if today == 5 { return true }
-                break
+                return 5
             case "Fri":
-                if today == 6 { return true }
-                break
+                return 6
             case "Sat":
-                if today == 7 { return true }
-                break
+                return 7
             case "Holiday":
-                return false
+                return 0
             default:
                 println("wtf")
-                return false
+                return 0
+        }
+    }
+    
+    private func stringifyHours(seconds: Double) -> String {
+        let hours = seconds / (60*60)
+        
+        var stringHours:String
+        var stringMinutes:String
+        
+        let wholeHours = Int(hours)
+        if wholeHours == 0 {
+            stringHours = ""
+        } else if wholeHours == 1 {
+            stringHours = "1 hour"
+        } else {
+            stringHours = "\(wholeHours) hours"
+        }
+        
+        let wholeMinutes = Int((hours - Double(Int(hours)))*60)
+        if wholeMinutes == 0 {
+            return stringHours
+        } else if wholeMinutes == 1 {
+            return "\(stringHours) 1 minute"
+        } else {
+            return "\(stringHours) \(wholeMinutes) minutes"
+        }
+    }
+    
+    func determineIfSweepingApplies(sweeping: NSDictionary) -> Bool {
+        let today = getToday()
+        let from = sweeping["from"] as String
+        let to = sweeping["to"] as String
+        let weekday = sweeping["weekday"] as String
+        let secondsIn24Hours = 24*60*60 as NSTimeInterval
+        
+        let cal = NSCalendar.currentCalendar()
+        let components = cal.components(NSCalendarUnit.CalendarUnitHour |
+            NSCalendarUnit.CalendarUnitMinute |
+            NSCalendarUnit.CalendarUnitDay |
+            NSCalendarUnit.CalendarUnitMonth |
+            NSCalendarUnit.CalendarUnitYear |
+            NSCalendarUnit.WeekdayCalendarUnit, fromDate: NSDate())
+        
+        var fromDate:NSDate
+        var toDate:NSDate
+        
+        
+        let originalDay = components.day
+        
+        // figure out which from is next
+        for var i = 0; i < 7; ++i {
+            let dateOffset = originalDay + i
+            components.day = dateOffset
+            let thisDay = cal.dateFromComponents(components)
+            
+            let newComponents = cal.components(NSCalendarUnit.CalendarUnitHour |
+                NSCalendarUnit.CalendarUnitMinute |
+                NSCalendarUnit.CalendarUnitDay |
+                NSCalendarUnit.CalendarUnitMonth |
+                NSCalendarUnit.CalendarUnitYear |
+                NSCalendarUnit.WeekdayCalendarUnit |
+                NSCalendarUnit.CalendarUnitWeekday, fromDate: thisDay!)
+            
+            if newComponents.weekday == convertDayToOrdinal(weekday) {
+                newComponents.hour = getHoursFromString(from)
+                newComponents.minute = getMinutesFromString(from)
+                fromDate = cal.dateFromComponents(newComponents)!
+
+                newComponents.hour = getHoursFromString(to)
+                newComponents.minute = getMinutesFromString(to)
+                toDate = cal.dateFromComponents(newComponents)!
+                
+                // figure out if this sweeping is in the next 24 hour
+                if fromDate.timeIntervalSinceNow < secondsIn24Hours && fromDate.timeIntervalSinceNow > 0 {
+                    println("sweeping applies", sweeping)
+                    self.annotation += ". You can park here for \(stringifyHours(fromDate.timeIntervalSinceNow))"
+                    
+                    return true
+                }
+                
+                // TODO are we currently in it?
+                if fromDate.timeIntervalSinceNow < 0 && toDate.timeIntervalSinceNow > 0 {
+                    if toDate.timeIntervalSinceNow < (toDate.timeIntervalSinceNow - fromDate.timeIntervalSinceNow) {
+                        println("currnetly in it")
+                    }
+                }
+                
+
             }
         }
         return false
