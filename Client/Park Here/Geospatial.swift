@@ -42,4 +42,24 @@ class Geospatial {
         dist = dist * 60 * 1.1515;
         return dist * 1.609344 * 1000;
     }
+    
+    class func mapRectForCoordinateRegion(region: MKCoordinateRegion) -> MKMapRect {
+        let center = region.center;
+        let span = region.span;
+        let topLeft =
+        CLLocationCoordinate2DMake(center.latitude + span.latitudeDelta / 2.0,
+            center.longitude - span.longitudeDelta / 2.0);
+        
+        let bottomRight =
+        CLLocationCoordinate2DMake(center.latitude - span.latitudeDelta / 2.0,
+            center.longitude + span.longitudeDelta / 2.0);
+        
+        let mapPointTopLeft = MKMapPointForCoordinate(topLeft);
+        let mapPointBottomRight = MKMapPointForCoordinate(bottomRight);
+        let width = mapPointBottomRight.x - mapPointTopLeft.x;
+        let height = mapPointBottomRight.y - mapPointTopLeft.y;
+        
+        let ret = MKMapRectMake(mapPointTopLeft.x, mapPointTopLeft.y, width, height);
+        return ret;
+    }
 }

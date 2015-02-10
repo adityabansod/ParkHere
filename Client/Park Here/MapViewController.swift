@@ -135,6 +135,11 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
                                 if let permitDays = result.valueForKeyPath("properties.Days") as? String {
                                     if let permitHourLimit = result.valueForKeyPath("properties.HrLimit") as? Int {
                                         polyline.annotation += "There is a \(permitHourLimit) hour limit here unless you have a type \(permitArea) permit. This is enforced \(permitDays) \(permitHours)."
+                                        
+                                        polyline.permitHourLimit = permitHourLimit
+                                        polyline.permitArea = permitArea
+                                        polyline.permitDays = permitDays
+                                        polyline.permitHours = permitHours
                                     }
                                 }
                             }
@@ -147,6 +152,10 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
                             if let permitDays = result.valueForKeyPath("properties.Days") as? String {
                                 if let permitHourLimit = result.valueForKeyPath("properties.HrLimit") as? Int {
                                     polyline.annotation += "There is a \(permitHourLimit) hour limit here. This is enforced \(permitDays) \(permitHours)."
+                                    
+                                    polyline.permitHourLimit = permitHourLimit
+                                    polyline.permitDays = permitDays
+                                    polyline.permitHours = permitHours
                                 }
                             }
                         } else {
@@ -201,7 +210,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         let point = tap.locationInView(self.mapView)
         let tapCoordinate = mapView.convertPoint(point, toCoordinateFromView: self.mapView)
         let region = MKCoordinateRegionMakeWithDistance(tapCoordinate, 1.0, 1.0)
-        let mapRect = MKMapRectForCoordinateRegion(region)
+        let mapRect = Geospatial.mapRectForCoordinateRegion(region)
         
         var messages:String = ""
         var title:String = ""
@@ -251,16 +260,23 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         }
     }
     
-    func resetCalendarOverlay() {
-        UIView.animateWithDuration(0.2, animations: {
+    // MARK: calendar overlay management
+    
+    func resetCalendarOverlay(animated:Bool) {
+        var handler:(Void) -> ()
+        handler = {
             self.opacityUnderlay.alpha = 0.0
             self.opacityUnderlay.frame.origin.y = -self.opacityUnderlay.frame.height
             
             self.streetNameLabel.hidden = true
             self.streetNameLabel.alpha = 0
             self.streetNameLabel.frame.origin.y = -self.streetNameLabel.frame.height
-        })
-        
+        }
+        if animated {
+            UIView.animateWithDuration(0.2, animations: handler)
+        } else {
+            handler()
+        }
         
         mondayLabel.textColor = UIColor.blackColor()
         tuesdayLabel.textColor = UIColor.blackColor()
@@ -273,16 +289,26 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     }
     
     func updateCalendarOverlay(polyline: PolylineWithAnnotations) {
-        resetCalendarOverlay()
+        resetCalendarOverlay(false)
+
+        UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.0, options: nil, animations: {
+//            self.opacityUnderlay.alpha = 0.7
+            self.opacityUnderlay.frame.origin.y = 20
+            
+//            self.streetNameLabel.hidden = false
+//            self.streetNameLabel.alpha = 1.0
+            self.streetNameLabel.frame.origin.y = 77
+            }, completion: {(animated:Bool) -> () in  })
+
         
         
         UIView.animateWithDuration(0.2, animations: {
             self.opacityUnderlay.alpha = 0.7
-            self.opacityUnderlay.frame.origin.y = 20
+//            self.opacityUnderlay.frame.origin.y = 20
             
             self.streetNameLabel.hidden = false
             self.streetNameLabel.alpha = 1.0
-            self.streetNameLabel.frame.origin.y = 77
+//            self.streetNameLabel.frame.origin.y = 77
 
         })
         
@@ -315,25 +341,27 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         println("\(polyline.id): \(streetNameLabel.text)")
     }
     
-    func MKMapRectForCoordinateRegion(region: MKCoordinateRegion) -> MKMapRect {
-        let center = region.center;
-        let span = region.span;
-        let topLeft =
-        CLLocationCoordinate2DMake(center.latitude + span.latitudeDelta / 2.0,
-        center.longitude - span.longitudeDelta / 2.0);
+    override func touchesBegan(touches: NSSet, withEvent event: UIEvent) {
+        let touch = touches.anyObject() as UITouch
+        var whichLabel:UILabel
         
-        let bottomRight =
-        CLLocationCoordinate2DMake(center.latitude - span.latitudeDelta / 2.0,
-        center.longitude + span.longitudeDelta / 2.0);
+        switch touch.view {
+        case sundayLabel: whichLabel = sundayLabel
+        case mondayLabel: whichLabel = mondayLabel
+        case tuesdayLabel: whichLabel = tuesdayLabel
+        case wednesdayLabel: whichLabel = wednesdayLabel
+        case thursdayLabel: whichLabel = thursdayLabel
+        case fridayLabel: whichLabel = fridayLabel
+        case saturdayLabel: whichLabel = saturdayLabel
+        default: return
+        }
         
-        let mapPointTopLeft = MKMapPointForCoordinate(topLeft);
-        let mapPointBottomRight = MKMapPointForCoordinate(bottomRight);
-        let width = mapPointBottomRight.x - mapPointTopLeft.x;
-        let height = mapPointBottomRight.y - mapPointTopLeft.y;
+        createAlert("something", message: selectedPolyline!.rulesForDay(whichLabel.text!))
         
-        let ret = MKMapRectMake(mapPointTopLeft.x, mapPointTopLeft.y, width, height);
-        return ret;
+//        println(whichLabel)
     }
+    
+    // MARK: UI Helpers
     
     func createAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .Alert)
@@ -344,12 +372,20 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         self.presentViewController(alert, animated: true, completion: nil)
     }
     
+    @IBAction func resetLocation(sender: UIButton) {
+        mapView.userLocation.coordinate
+        
+        mapView.setRegion(MKCoordinateRegionMake(mapView.userLocation.coordinate, MKCoordinateSpanMake(0.0005, 0.0005)), animated: true)
+        
+    }
+    
+    // MARK: MapView Handling
     func mapView(mapView: MKMapView!, regionWillChangeAnimated animated: Bool) {
-        resetCalendarOverlay()
+        resetCalendarOverlay(true)
     }
     
     func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
-        resetCalendarOverlay()
+        resetCalendarOverlay(true)
         let maxDistance = Geospatial.findMaxDimensionsOfMap(mapView)
         if(maxDistance < 1000) {
             streetNameLabel.hidden = true
@@ -373,7 +409,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
             } else if poly.hasSomeRestrictions {
                 polylineRenderer.strokeColor = UIColor.greenColor().colorWithAlphaComponent(0.5)
             } else {
-                polylineRenderer.strokeColor = UIColor.greenColor().colorWithAlphaComponent(0.8)
+                polylineRenderer.strokeColor = UIColor.blueColor().colorWithAlphaComponent(0.8)
             }
             
             polylineRenderer.lineWidth = 4

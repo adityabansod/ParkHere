@@ -9,8 +9,17 @@
 import UIKit
 import MapKit
 
-enum RegulationType {
+enum RegulationType :Printable {
     case ParkingPermit, TimeLimited, ParkingMeters, None, Unknown
+    var description: String {
+        switch self {
+        case .ParkingPermit: return "Parking Permit";
+        case .TimeLimited: return "Time Limited";
+        case .None: return "None";
+        case .ParkingMeters: return "Parking Meters";
+        case .Unknown: return "Unknown";
+        }
+    }
 }
 
 class PolylineWithAnnotations: MKPolyline {
@@ -21,6 +30,17 @@ class PolylineWithAnnotations: MKPolyline {
     var sweepings:NSArray = []
     var type:RegulationType = .None
     var renderer:MKPolylineRenderer = MKPolylineRenderer()
+    
+    var permitHourLimit:Int = 0
+    var permitArea:String = ""
+    var permitDays:String = ""
+    var permitHours:String = ""
+    
+    var annotations2:String {
+        get {
+            return type.description + " \(sweepings.count)"
+        }
+    }
     
     var hasAnyRestrictions:Bool {
         get {
@@ -111,6 +131,22 @@ class PolylineWithAnnotations: MKPolyline {
         }
     }
     
+    func rulesForDay(day:String) -> String {
+        let ordinal = convertDayToOrdinal(day)
+        
+        for sweep in sweepings {
+            let weekday = sweep["weekday"] as String
+            let thisWeekdayOrdinal = convertDayToOrdinal(weekday)
+            if ordinal == thisWeekdayOrdinal {
+                return sweep["description"] as String
+            }
+            
+        }
+        
+        
+        return type.description
+    }
+    
     func determineIfSweepingApplies(sweeping: NSDictionary) -> Bool {
         let today = getToday()
         let from = sweeping["from"] as String
@@ -169,8 +205,6 @@ class PolylineWithAnnotations: MKPolyline {
                         println("currnetly in it")
                     }
                 }
-                
-
             }
         }
         return false
