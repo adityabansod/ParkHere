@@ -74,8 +74,10 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         tap.delegate = self
         mapView.addGestureRecognizer(tap)
         
+        println("starting network request")
         let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
             self.processRegulationsData(data)
+            println("done with network request, done with processregulationsdata")
         }
         task.resume()
         networkRequestPending = true
@@ -250,15 +252,15 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     }
     
     func resetCalendarOverlay() {
-        mondayLabel.hidden = true
-        tuesdayLabel.hidden = true
-        wednesdayLabel.hidden = true
-        thursdayLabel.hidden = true
-        fridayLabel.hidden = true
-        saturdayLabel.hidden = true
-        sundayLabel.hidden = true
-        streetNameLabel.hidden = true
-        opacityUnderlay.hidden = true
+        UIView.animateWithDuration(0.2, animations: {
+            self.opacityUnderlay.alpha = 0.0
+            self.opacityUnderlay.frame.origin.y = -self.opacityUnderlay.frame.height
+            
+            self.streetNameLabel.hidden = true
+            self.streetNameLabel.alpha = 0
+            self.streetNameLabel.frame.origin.y = -self.streetNameLabel.frame.height
+        })
+        
         
         mondayLabel.textColor = UIColor.blackColor()
         tuesdayLabel.textColor = UIColor.blackColor()
@@ -273,15 +275,16 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     func updateCalendarOverlay(polyline: PolylineWithAnnotations) {
         resetCalendarOverlay()
         
-        mondayLabel.hidden = false
-        tuesdayLabel.hidden = false
-        wednesdayLabel.hidden = false
-        thursdayLabel.hidden = false
-        fridayLabel.hidden = false
-        saturdayLabel.hidden = false
-        sundayLabel.hidden = false
-        streetNameLabel.hidden = false
-        opacityUnderlay.hidden = false
+        
+        UIView.animateWithDuration(0.2, animations: {
+            self.opacityUnderlay.alpha = 0.7
+            self.opacityUnderlay.frame.origin.y = 20
+            
+            self.streetNameLabel.hidden = false
+            self.streetNameLabel.alpha = 1.0
+            self.streetNameLabel.frame.origin.y = 77
+
+        })
         
         for sweeping in polyline.sweepings {
             if let day = sweeping.valueForKeyPath("weekday") as? String {
@@ -341,11 +344,19 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         self.presentViewController(alert, animated: true, completion: nil)
     }
     
+    func mapView(mapView: MKMapView!, regionWillChangeAnimated animated: Bool) {
+        resetCalendarOverlay()
+    }
+    
     func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
         resetCalendarOverlay()
         let maxDistance = Geospatial.findMaxDimensionsOfMap(mapView)
         if(maxDistance < 1000) {
+            streetNameLabel.hidden = true
             lookupSweepingForLocation(mapView.centerCoordinate, maxDistance: maxDistance)
+        } else {
+            streetNameLabel.hidden = false
+            streetNameLabel.text = "Zoom in to loading parking information."
         }
     }
     
