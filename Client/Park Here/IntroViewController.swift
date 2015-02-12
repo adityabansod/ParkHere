@@ -82,7 +82,7 @@ class IntroViewController: UIPageViewController, UIPageViewControllerDataSource 
     }
     
     func shouldRunIntro() -> Bool {
-        return false
+        return true
     }
     
     func pageViewController(pageViewController: UIPageViewController, viewControllerBeforeViewController viewController: UIViewController) -> UIViewController? {

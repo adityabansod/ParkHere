@@ -42,3 +42,11 @@ Mongo needs an index to query on geospatial data. To create it from the `mongo` 
 `db.streets.ensureIndex({"geometry":"2dsphere"})`
 
 Where `streets` is your collection name and `geometry` is the object in your document that contains the GeoJSON location data.
+
+# Note: 2.5D Points
+
+Depending on the encoding of your source data, you may have had Point2.5D instead of just Point objects inside of it. Inside of GeoJSON that ends up looking like this:
+
+`[ -122.40482721734567, 37.757038688048105, 0.0 ]`
+
+Note the third `0.0` value. Mongo doesn't play well with that, so before you `mongoimport` the data, make sure you remove all `, 0.0` instances from your source GeoJSON. 

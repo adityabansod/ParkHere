@@ -1,10 +1,11 @@
 {
-  "name": "sfstreetsweeping",
+  "name": "parkhere",
   "version": "0.0.0",
-  "description": "Given a set of lat/lon, returns street sweeping rules for nearby blocks",
+  "description": "Website and API for Park Here",
   "main": "app.js",
   "scripts": {
-    "test": "foreman start"
+    "test": "foreman start",
+    "start": "node app.js"
   },
   "repository": "",
   "author": "Aditya Bansod (@adityabansod, http://www.adityabansod.net)",
@@ -12,7 +13,8 @@
   "dependencies": {
     "express": "^3.4.8",
     "moment": "^2.8.4",
-    "async": "^0.9.0"
+    "async": "^0.9.0",
+    "mongojs": "^0.18.1"
   },
   "engines": {
     "node": "0.10.x"
