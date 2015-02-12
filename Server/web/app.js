@@ -1,5 +1,6 @@
 var express = require('express'),
     geodata = require('./geodata.js'),
+    geo2 = require('./geo2.js'),
     settings = require('./settings.js');
 
     app = express(),
@@ -12,14 +13,23 @@ app.get('/nearby/:lat/:lon', function(req, res) {
 
     var lat = parseFloat(req.params.lat),
         lon = parseFloat(req.params.lon);
-    if(req.query.maxDistance != null)
+    if(req.query.maxDistance)
         maxDistance = parseInt(req.query.maxDistance);
     else
     	maxDistance = settings().maxDistance;
-    geodata.nearby(lat, lon, maxDistance, function(docs) {
-    	console.log('answered ' + req.url + ' in ' + ((new Date()).getTime() - started.getTime()) + 'ms');
-        res.send(docs);
-    });
+
+    if(req.query.geoOne) {
+        geodata.nearby(lat, lon, maxDistance, function(docs) {
+         console.log('GEOONE: answered ' + req.url + ' in ' + ((new Date()).getTime() - started.getTime()) + 'ms');
+            res.send(docs);
+        });
+    } else {
+        geo2.nearby(lat, lon, maxDistance, function(docs) {
+            console.log('GEOTWO: answered ' + req.url + ' in ' + ((new Date()).getTime() - started.getTime()) + 'ms');
+            res.send(docs);
+        });
+    }
+
 });
 app.get('/settings', function(req, res) {
     res.send(settings());

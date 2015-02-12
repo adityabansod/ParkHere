@@ -67,8 +67,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
             return
         }
         
-//        let url = NSURL(string: "http://192.168.2.2:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
-        let url = NSURL(string: "https://parkhereapp.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
+        let url = NSURL(string: "http://192.168.1.186:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
+//        let url = NSURL(string: "https://parkhereapp.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
         
         let tap = UITapGestureRecognizer(target: self, action: Selector("handleOverlayTap:"))
         tap.delegate = self
@@ -124,50 +124,54 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
                     }
                     
                     
-                    let regs = result.valueForKeyPath("properties.Regulation") as String;
-                    switch regs {
-                    case "Unregulated":
-                        polyline.annotation += "There are no permits or meters on this block."
-                        polyline.type = .None
-                    case "RPP":
-                        if let permitArea = result.valueForKeyPath("properties.PermitArea") as? String {
+                    if let regs = result.valueForKeyPath("properties.Regulation") as? String {
+                        switch regs {
+                        case "Unregulated":
+                            polyline.annotation += "There are no permits or meters on this block."
+                            polyline.type = .None
+                        case "RPP":
+                            if let permitArea = result.valueForKeyPath("properties.PermitArea") as? String {
+                                if let permitHours = result.valueForKeyPath("properties.Hours") as? String {
+                                    if let permitDays = result.valueForKeyPath("properties.Days") as? String {
+                                        if let permitHourLimit = result.valueForKeyPath("properties.HrLimit") as? Int {
+                                            polyline.annotation += "There is a \(permitHourLimit) hour limit here unless you have a type \(permitArea) permit. This is enforced \(permitDays) \(permitHours)."
+                                            
+                                            polyline.permitHourLimit = permitHourLimit
+                                            polyline.permitArea = permitArea
+                                            polyline.permitDays = permitDays
+                                            polyline.permitHours = permitHours
+                                        }
+                                    }
+                                }
+                            } else {
+                                polyline.annotation += "This block requires a residential parking permit."
+                            }
+                            polyline.type = .ParkingPermit
+                        case "Time limited": // TODO: ollapse this logic with RPP. it's the same except it has no permit area
                             if let permitHours = result.valueForKeyPath("properties.Hours") as? String {
                                 if let permitDays = result.valueForKeyPath("properties.Days") as? String {
                                     if let permitHourLimit = result.valueForKeyPath("properties.HrLimit") as? Int {
-                                        polyline.annotation += "There is a \(permitHourLimit) hour limit here unless you have a type \(permitArea) permit. This is enforced \(permitDays) \(permitHours)."
+                                        polyline.annotation += "There is a \(permitHourLimit) hour limit here. This is enforced \(permitDays) \(permitHours)."
                                         
                                         polyline.permitHourLimit = permitHourLimit
-                                        polyline.permitArea = permitArea
                                         polyline.permitDays = permitDays
                                         polyline.permitHours = permitHours
                                     }
                                 }
+                            } else {
+                                polyline.annotation += "This block requires a residential parking permit."
                             }
-                        } else {
-                            polyline.annotation += "This block requires a residential parking permit."
+                            polyline.type = .TimeLimited
+                        case "Metered":
+                            polyline.annotation += "This block has parking meters."
+                            polyline.type = .ParkingMeters
+                        default:
+                            polyline.annotation += regs
+                            polyline.type = .Unknown
                         }
-                        polyline.type = .ParkingPermit
-                    case "Time limited": // TODO: ollapse this logic with RPP. it's the same except it has no permit area
-                        if let permitHours = result.valueForKeyPath("properties.Hours") as? String {
-                            if let permitDays = result.valueForKeyPath("properties.Days") as? String {
-                                if let permitHourLimit = result.valueForKeyPath("properties.HrLimit") as? Int {
-                                    polyline.annotation += "There is a \(permitHourLimit) hour limit here. This is enforced \(permitDays) \(permitHours)."
-                                    
-                                    polyline.permitHourLimit = permitHourLimit
-                                    polyline.permitDays = permitDays
-                                    polyline.permitHours = permitHours
-                                }
-                            }
-                        } else {
-                            polyline.annotation += "This block requires a residential parking permit."
-                        }
-                        polyline.type = .TimeLimited
-                    case "Metered":
-                        polyline.annotation += "This block has parking meters."
-                        polyline.type = .ParkingMeters
-                    default:
-                        polyline.annotation += regs
+                    } else {
                         polyline.type = .Unknown
+                        polyline.annotation = "Unregulated"
                     }
                     
                     polyline.annotation = polyline.annotation.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
@@ -346,14 +350,14 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         var whichLabel:UILabel
         
         switch touch.view {
-        case sundayLabel: whichLabel = sundayLabel
-        case mondayLabel: whichLabel = mondayLabel
-        case tuesdayLabel: whichLabel = tuesdayLabel
-        case wednesdayLabel: whichLabel = wednesdayLabel
-        case thursdayLabel: whichLabel = thursdayLabel
-        case fridayLabel: whichLabel = fridayLabel
-        case saturdayLabel: whichLabel = saturdayLabel
-        default: return
+            case sundayLabel: whichLabel = sundayLabel
+            case mondayLabel: whichLabel = mondayLabel
+            case tuesdayLabel: whichLabel = tuesdayLabel
+            case wednesdayLabel: whichLabel = wednesdayLabel
+            case thursdayLabel: whichLabel = thursdayLabel
+            case fridayLabel: whichLabel = fridayLabel
+            case saturdayLabel: whichLabel = saturdayLabel
+            default: return
         }
         
         createAlert("something", message: selectedPolyline!.rulesForDay(whichLabel.text!))
