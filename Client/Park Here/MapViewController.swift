@@ -33,6 +33,11 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     override func viewDidLoad() {
         super.viewDidLoad()
         setupLocationService()
+        
+        
+        let tap = UITapGestureRecognizer(target: self, action: Selector("handleOverlayTap:"))
+        tap.delegate = self
+        mapView.addGestureRecognizer(tap)
     }
     
     func setupLocationService() {
@@ -67,12 +72,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
             return
         }
         
-        let url = NSURL(string: "http://192.168.1.186:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
-//        let url = NSURL(string: "https://parkhereapp.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
-        
-        let tap = UITapGestureRecognizer(target: self, action: Selector("handleOverlayTap:"))
-        tap.delegate = self
-        mapView.addGestureRecognizer(tap)
+//        let url = NSURL(string: "http://192.168.1.186:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
+        let url = NSURL(string: "https://parkhereapp.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
         
         println("starting network request")
         let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
@@ -81,8 +82,9 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         }
         task.resume()
         networkRequestPending = true
-        loadingIndicator.startAnimating()
-
+        dispatch_async(dispatch_get_main_queue()) {
+            self.loadingIndicator.startAnimating()
+        }
 
     }
     
@@ -207,7 +209,9 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     
     func clearNetworkPendingFlag() {
         networkRequestPending = false
-        loadingIndicator.stopAnimating()
+        dispatch_async(dispatch_get_main_queue()) {
+            self.loadingIndicator.stopAnimating()
+        }
     }
     
     func handleOverlayTap(tap: UITapGestureRecognizer) {
@@ -251,14 +255,17 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
                 if dist > 75 {continue}
                 if polyline.street != title {continue}
                 
-                updateCalendarOverlay(polyline)
-
+                // all UI changes go in to a block
+                dispatch_async(dispatch_get_main_queue()) {
+                    self.updateCalendarOverlay(polyline)
+                    
+                    messages += polyline.annotation + " "
+                    println("Creating alert for \(polyline.id) at distance \(dist)")
+                    self.selectedPolyline = polyline
+                    self.selectedPolylineOldColor = polyline.renderer.strokeColor
+                    polyline.renderer.strokeColor = UIColor.brownColor()
+                }
                 
-                messages += polyline.annotation + " "
-                println("Creating alert for \(polyline.id) at distance \(dist)")
-                selectedPolyline = polyline
-                selectedPolylineOldColor = polyline.renderer.strokeColor
-                polyline.renderer.strokeColor = UIColor.brownColor()
                 
             }
         }
@@ -296,24 +303,16 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         resetCalendarOverlay(false)
 
         UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.0, options: nil, animations: {
-//            self.opacityUnderlay.alpha = 0.7
             self.opacityUnderlay.frame.origin.y = 20
-            
-//            self.streetNameLabel.hidden = false
-//            self.streetNameLabel.alpha = 1.0
             self.streetNameLabel.frame.origin.y = 77
-            }, completion: {(animated:Bool) -> () in  })
+        }, completion: {(animated:Bool) -> () in  })
 
         
         
         UIView.animateWithDuration(0.2, animations: {
             self.opacityUnderlay.alpha = 0.7
-//            self.opacityUnderlay.frame.origin.y = 20
-            
             self.streetNameLabel.hidden = false
             self.streetNameLabel.alpha = 1.0
-//            self.streetNameLabel.frame.origin.y = 77
-
         })
         
         for sweeping in polyline.sweepings {
@@ -385,13 +384,18 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     
     // MARK: MapView Handling
     func mapView(mapView: MKMapView!, regionWillChangeAnimated animated: Bool) {
-        resetCalendarOverlay(true)
+        dispatch_async(dispatch_get_main_queue()) {
+            self.resetCalendarOverlay(true)
+        }
     }
     
     func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
-        resetCalendarOverlay(true)
+        dispatch_async(dispatch_get_main_queue()) {
+            self.resetCalendarOverlay(true)
+        }
         let maxDistance = Geospatial.findMaxDimensionsOfMap(mapView)
         if(maxDistance < 1000) {
+            // TODO MOVE THIS TO A DIFFERNET LABEL
             streetNameLabel.hidden = true
             lookupSweepingForLocation(mapView.centerCoordinate, maxDistance: maxDistance)
         } else {
