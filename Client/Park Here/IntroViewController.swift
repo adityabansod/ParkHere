@@ -19,6 +19,8 @@ class IntroViewController: UIPageViewController, UIPageViewControllerDataSource 
     "Tap on a street name to view details for any block.",
     "Get started now!"]
     
+    let backgrounColor:UIColor = UIColor(red: 0.988, green: 1, blue: 0.961, alpha: 1.0)
+    
     
     
     var introPageViewController:UIPageViewController = UIPageViewController()
@@ -62,7 +64,7 @@ class IntroViewController: UIPageViewController, UIPageViewControllerDataSource 
         let pageControl = UIPageControl.appearance()
         pageControl.pageIndicatorTintColor = UIColor.lightGrayColor()
         pageControl.currentPageIndicatorTintColor = UIColor.blackColor()
-        pageControl.backgroundColor = UIColor.whiteColor()
+        pageControl.backgroundColor = backgrounColor
     }
     
     func setupIntro() {
@@ -76,6 +78,7 @@ class IntroViewController: UIPageViewController, UIPageViewControllerDataSource 
         introPageViewController.setViewControllers([startingViewController], direction: UIPageViewControllerNavigationDirection.Forward, animated: false, completion: nil)
         
         introPageViewController.view.frame = CGRectMake(0,0, self.view.frame.size.width, self.view.frame.height)
+        introPageViewController.view.backgroundColor = backgrounColor
         addChildViewController(introPageViewController)
         view.addSubview(introPageViewController.view)
         introPageViewController.didMoveToParentViewController(self)

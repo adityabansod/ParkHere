@@ -1,16 +1,17 @@
 var dbUrl = process.env.MONGOLAB_URI || "streets",
     db = require("mongojs").connect(dbUrl),
-    moment = require('moment'),
     async = require('async'),
     settings = require('./settings.js');
+
 exports.nearby = function(lat, lon, maxDistance, callbackFn) {
-    if (maxDistance > 250) maxDistance = settings().maxDistance;
-    console.log('GEOONE: Issuing query for blockfaces at ' + lat + ', ' + lon + ' at ' + maxDistance + 'm');
+    if (maxDistance > settings().maxDistance)
+        maxDistance = settings().maxDistance;
+    console.log('GEO2: Issuing query for all known data at ' + lat + ', ' + lon + ' at ' + maxDistance + 'm');
     queryForBlockface(lat, lon, maxDistance, callbackFn);
 }
 
 function queryForBlockface(lat, lon, maxDistance, callbackFn) {
-    db.collection('sfparking').find({
+    db.collection('sfca').find({
         $and:
         [
             {
@@ -21,25 +22,37 @@ function queryForBlockface(lat, lon, maxDistance, callbackFn) {
                         $maxDistance: maxDistance
                     }
                 }
-            },
-            {
-                "properties.Regulation": { $ne: null }
             }
         ]
     },
     function(err, res) {
-        console.log('found ' + res.length + ' matching blockfaces, now querying street sweeping')
-        queryForStreetSweeping(res, callbackFn);
+        console.log('found ' + res.length + ' matching rules');
+
+        var sweepingRes = [], parkingRes = [];
+
+        for (var i = res.length - 1; i >= 0; i--) {
+            var source = res[i].properties.Source;
+            if (source == "SF-CA-Sweeping") {
+                sweepingRes.push(res[i]);
+            } else if (source == "SF-CA-Parking") {
+                parkingRes.push(res[i]);
+            } else {
+                console.log("unknown source type", source);
+            }
+        };
+
+        queryForStreetSweeping(sweepingRes, parkingRes, callbackFn);
     });
 }
 
-function queryForStreetSweeping(blockfaceResult, callbackFn) {
-    // console.log('querying for street sweeping against ' + blockfaceResult.length + ' faces');
+function queryForStreetSweeping(sweepingResult, parkingResult, callbackFn) {
+    console.log('parking results: ' + parkingResult.length + ', sweeping ' + sweepingResult.length + ' parking results');
     // build up the list of queries
     var queries = [];
-    for (var i = 0; i < blockfaceResult.length; i++) {
+    for (var i = 0; i < parkingResult.length; i++) {
         var query = (function(callback) {
-            var blockface = this;
+            var blockface = this.parking;
+            var sweepingResult = this.sweeping;
             var lat = 0;
             var lon = 0;
 
@@ -55,47 +68,59 @@ function queryForStreetSweeping(blockfaceResult, callbackFn) {
 
             // 2. search the streets collection for locations
             // near that center point
-            db.collection('sfstreets').find({
-                    geometry: {
-                        $near: { "type": "Point", "coordinates": [lon, lat] },
-                        $minDistance: 0,
-                        $maxDistance: 25
-                    }
-                }
-            ,
-            (function(err, res) {
-                var sweepings =  res;
 
-                // console.log('filtered ' + sweepings.length + ' of ' + res.length + ' sweeping results for ' + this._id);
-                if(sweepings.length > 0) {
-                    /*
-                       3. hokay. since we searched for sweeping locations based on
-                       the centerpoint of the LineString in the parking data, this
-                       can lead to us finding midblock lanes instead of the acutal
-                       street we're on.
+            var filteredSweeping = [];
 
-                       thus, we'll look through all the resulting sweeping results
-                       and find the first one (the nearest since we query with $near)
-                       that has a slope within some percent of this LineString's slope                   
-                    */ 
-                    var slope = calculateLineSlope(this.geometry.coordinates).slope;
-                    var delta = 100; // pick an arbitrarly high delta to start
-                    for (var i = 0; i < sweepings.length; i++) {
-                        var sweep = sweepings[i],
-                            sweepSlope = calculateLineSlope(sweep.geometry.coordinates,
-                                                            sweep.properties.STREETNAME).slope,
-                            sweepDelta = (slope - sweepSlope);
-                            if((Math.min(delta, sweepDelta)) == sweepDelta &&  (slope/sweepSlope) > settings().slopeTolerance) {
-                                this.street = sweep.properties.STREETNAME;
-                                delta = sweepDelta;
-                            }
-                    };
-                    this.streetSlopeAndDirection = calculateLineSlope(this.geometry.coordinates, this.street);
+            for (var k = sweepingResult.length - 1; k >= 0; k--) {
+                var distance, latParking = 0, lonParking = 0;
+                var sweepingCords = sweepingResult[k].geometry.coordinates;
+                for (var l = 0; l < sweepingCords.length; l++) {
+                    latParking += sweepingCords[l][1];
+                    lonParking += sweepingCords[l][0];
+                };
+                latParking = latParking/sweepingCords.length;
+                lonParking = lonParking/sweepingCords.length;
+
+                distance = wgs84distance(lat, lon, latParking, lonParking);
+
+
+                if(distance < 25) {
+                // console.log(lat,lon, latParking, lonParking, distance);
+                    filteredSweeping.push(sweepingResult[k]);
                 }
-                this.sweepings = sweepings;
-                callback(err, this);
-            }).bind(blockface));
-        }).bind(blockfaceResult[i]);
+            };
+
+            var sweepings =  filteredSweeping;
+
+            // console.log('filtered ' + sweepings.length + ' sweepings for ' + blockface._id);
+            if(sweepings.length > 0) {
+                /*
+                   3. hokay. since we searched for sweeping locations based on
+                   the centerpoint of the LineString in the parking data, this
+                   can lead to us finding midblock lanes instead of the acutal
+                   street we're on.
+
+                   thus, we'll look through all the resulting sweeping results
+                   and find the first one (the nearest since we query with $near)
+                   that has a slope within some percent of this LineString's slope                   
+                */ 
+                var slope = calculateLineSlope(blockface.geometry.coordinates).slope;
+                var delta = 100; // pick an arbitrarly high delta to start
+                for (var i = 0; i < sweepings.length; i++) {
+                    var sweep = sweepings[i],
+                        sweepSlope = calculateLineSlope(sweep.geometry.coordinates,
+                                                        sweep.properties.STREETNAME).slope,
+                        sweepDelta = (slope - sweepSlope);
+                        if((Math.min(delta, sweepDelta)) == sweepDelta &&  (slope/sweepSlope) > settings().slopeTolerance) {
+                            blockface.street = sweep.properties.STREETNAME;
+                            delta = sweepDelta;
+                        }
+                };
+                blockface.streetSlopeAndDirection = calculateLineSlope(blockface.geometry.coordinates, blockface.street);
+            }
+            blockface.sweepings = sweepings;
+            callback(null, blockface);
+        }).bind({"parking": parkingResult[i], "sweeping": sweepingResult});
 
         queries.push(query);
     };
