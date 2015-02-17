@@ -42,17 +42,21 @@ class PolylineWithAnnotations: MKPolyline {
         }
     }
     
+    var hasRestrictionsInNext24Hours:Bool {
+        get {
+            return hasSweepingsToday || determineIfParkingRestrictionsApply()
+        }
+    }
+    
     var hasAnyRestrictions:Bool {
         get {
-            // clearly this is not the best solution since it depends on the 
-            // string value of annotation but this works for now
-            return sweepings.count > 0 && annotation != ""
+            return hasSweepingsToday && determineIfParkingRestrictionsApply()
         }
     }
     
     var hasSomeRestrictions:Bool {
         get {
-            return sweepings.count > 0 || annotation != ""
+            return hasSweepingsToday || determineIfParkingRestrictionsApply()
         }
     }
     
@@ -84,9 +88,9 @@ class PolylineWithAnnotations: MKPolyline {
     
     private func convertDayToOrdinal(raw: String) -> Int {
         switch(raw) {
-            case "Sun":
+            case "Sun", "Su":
                 return 1
-            case "Mon":
+            case "Mon", "M":
                 return 2
             case "Tues":
                 return 3
@@ -94,9 +98,9 @@ class PolylineWithAnnotations: MKPolyline {
                 return 4
             case "Thu":
                 return 5
-            case "Fri":
+            case "Fri", "F":
                 return 6
-            case "Sat":
+            case "Sat", "Sa":
                 return 7
             case "Holiday":
                 return 0
@@ -147,6 +151,59 @@ class PolylineWithAnnotations: MKPolyline {
         return type.description
     }
     
+    func determineIfParkingRestrictionsApply() -> Bool {
+        // TODO should use proper Swift nullability ther
+        if permitArea == "" {
+            // there are no restrictions
+            return false
+        }
+        
+        let permitFrom = convertDayToOrdinal(permitDays.componentsSeparatedByString("-")[0] as String)
+        let permitTo = convertDayToOrdinal(permitDays.componentsSeparatedByString("-")[1] as String)
+        
+        let permitHoursFrom = permitHours.componentsSeparatedByString("-")[0].toInt()
+        let permitHoursTo = permitHours.componentsSeparatedByString("-")[1].toInt()
+        
+        let today = getToday()
+        
+        let cal = NSCalendar.currentCalendar()
+        let todayComponents = cal.components(
+            NSCalendarUnit.CalendarUnitDay |
+                NSCalendarUnit.CalendarUnitMonth |
+                NSCalendarUnit.CalendarUnitYear |
+                NSCalendarUnit.CalendarUnitWeekday, fromDate: NSDate())
+        println("\(todayComponents.weekday) + \(permitFrom)")
+        
+        // construct a NSDate from the from time and to time
+
+        
+        
+        if todayComponents.weekday >= permitFrom && todayComponents.weekday <= permitTo {
+            
+            // TODO we know we're in the days, but are we within the times?
+            
+            // TODO do I have a permit of this type?
+            
+            if permitArea.uppercaseString.rangeOfString("S") != nil {
+                // if you have the permit for this area, parking restrictions do not apply
+                return false
+            }
+            
+            
+            return true
+            
+        }
+        
+//        let dayOfWeekDelta =
+        
+//        fromComponents.hour = permitHoursFrom!
+        
+        
+        
+        
+        return true
+    }
+    
     func determineIfSweepingApplies(sweeping: NSDictionary) -> Bool {
         let today = getToday()
         let from = sweeping["from"] as String
@@ -193,8 +250,7 @@ class PolylineWithAnnotations: MKPolyline {
                 
                 // figure out if this sweeping is in the next 24 hour
                 if fromDate.timeIntervalSinceNow < secondsIn24Hours && fromDate.timeIntervalSinceNow > 0 {
-                    println("sweeping applies", sweeping)
-                    self.annotation += ". You can park here for \(stringifyHours(fromDate.timeIntervalSinceNow))"
+                    self.annotation += " You can park here for \(stringifyHours(fromDate.timeIntervalSinceNow))."
                     
                     return true
                 }
