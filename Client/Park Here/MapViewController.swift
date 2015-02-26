@@ -72,8 +72,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
             return
         }
         
-        let url = NSURL(string: "http://192.168.1.186:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
-//        let url = NSURL(string: "https://parkhereapp.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
+//        let url = NSURL(string: "http://localhost:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
+        let url = NSURL(string: "https://parkhereapp.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
         
         println("starting network request")
         let task = NSURLSession.sharedSession().dataTaskWithURL(url!) {(data, response, error) in
