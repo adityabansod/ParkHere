@@ -62,4 +62,18 @@ class Geospatial {
         let ret = MKMapRectMake(mapPointTopLeft.x, mapPointTopLeft.y, width, height);
         return ret;
     }
+    
+    class func coordinateInsideSupportedBoundingBox(cord: CLLocationCoordinate2D) -> Bool {
+        var sanFranciscBoundsCoordinates:[CLLocationCoordinate2D] = [
+            CLLocationCoordinate2DMake(37.700392,-122.508202),
+            CLLocationCoordinate2DMake(37.702837,-122.353020),
+            CLLocationCoordinate2DMake(37.834192,-122.356110),
+            CLLocationCoordinate2DMake(37.808970,-122.527428)
+        ]
+        let sanFranciscBounds = MKPolygon(coordinates: &sanFranciscBoundsCoordinates, count: sanFranciscBoundsCoordinates.count)
+        
+        return MKMapRectContainsPoint(sanFranciscBounds.boundingMapRect, MKMapPointForCoordinate(cord))
+        
+    }
+    
 }

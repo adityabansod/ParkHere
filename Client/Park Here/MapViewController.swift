@@ -28,6 +28,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     var selectedPolyline:PolylineWithAnnotations?
     var selectedPolylineOldColor:UIColor?
     @IBOutlet weak var loadingIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var alertOverlay: UIView!
+    @IBOutlet weak var alertOverlayLabel: UILabel!
     
 
     override func viewDidLoad() {
@@ -377,8 +379,14 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         self.presentViewController(alert, animated: true, completion: nil)
     }
     
+    func updateAlertOverlay(message: String, show: Bool) {
+        dispatch_async(dispatch_get_main_queue()) {
+            self.alertOverlayLabel.text = message
+            self.alertOverlay.hidden = !show
+        }
+    }
+    
     @IBAction func resetLocation(sender: UIButton) {
-        mapView.userLocation.coordinate
         
         mapView.setRegion(MKCoordinateRegionMake(mapView.userLocation.coordinate, MKCoordinateSpanMake(0.0005, 0.0005)), animated: true)
         
@@ -395,14 +403,19 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         dispatch_async(dispatch_get_main_queue()) {
             self.resetCalendarOverlay(true)
         }
-        let maxDistance = Geospatial.findMaxDimensionsOfMap(mapView)
-        if(maxDistance < 1000) {
-            // TODO MOVE THIS TO A DIFFERNET LABEL
-            streetNameLabel.hidden = true
-            lookupSweepingForLocation(mapView.centerCoordinate, maxDistance: maxDistance)
+        
+        let center = mapView.centerCoordinate
+        
+        if Geospatial.coordinateInsideSupportedBoundingBox(center) {
+            let maxDistance = Geospatial.findMaxDimensionsOfMap(mapView)
+            if(maxDistance < 1000) {
+                updateAlertOverlay("", show: false)
+                lookupSweepingForLocation(center, maxDistance: maxDistance)
+            } else {
+                updateAlertOverlay("Zoom in to load parking information.", show: true)
+            }
         } else {
-            streetNameLabel.hidden = false
-            streetNameLabel.text = "Zoom in to loading parking information."
+            updateAlertOverlay("ParkHere only supports San Francisco", show: true)
         }
     }
     
