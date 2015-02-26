@@ -111,6 +111,8 @@ function queryForStreetSweeping(sweepingResult, parkingResult, callbackFn) {
                         sweepSlope = calculateLineSlope(sweep.geometry.coordinates,
                                                         sweep.properties.STREETNAME).slope,
                         sweepDelta = (slope - sweepSlope);
+                        // console.log("step3_slope", delta, sweepDelta, slope / sweepSlope, sweep._id)
+
                         if((Math.min(delta, sweepDelta)) == sweepDelta &&  (slope/sweepSlope) > settings().slopeTolerance) {
                             blockface.street = sweep.properties.STREETNAME;
                             delta = sweepDelta;
@@ -135,7 +137,7 @@ function queryForStreetSweeping(sweepingResult, parkingResult, callbackFn) {
            street sweeping data 
         */ 
         for (var i = 0; i < results.length; i++) {
-            // console.log('angle ' + results[i].streetSlopeAndDirection.angle);
+            // console.log(results[i]._id);
             var minDistance = 1000;
             var pairStreet;
             for (var j = 0; j < results.length; j++) {
@@ -146,10 +148,14 @@ function queryForStreetSweeping(sweepingResult, parkingResult, callbackFn) {
                 var cord2Slope = calculateLineSlope(results[j].geometry.coordinates).slope;
 
                 if(Math.min(distance, minDistance) == distance && distance != 0) {
+                    // console.log("step4_slope", cord1Slope / cord2Slope, results[i]._id, results[j]._id)
+
                     if(cord1Slope / cord2Slope > settings().slopeTolerance) {
                         if(results[i].street == results[j].street) {
-                            minDistance = distance;
-                            pairStreet = results[j];
+                            if(results[i]._id != results[j]._id) {
+                                minDistance = distance;
+                                pairStreet = results[j];
+                            }
                         }
                     }
                 }
@@ -157,8 +163,13 @@ function queryForStreetSweeping(sweepingResult, parkingResult, callbackFn) {
             if(pairStreet != null) {
                 results[i].pairStreet = {"_id": pairStreet._id, "name": pairStreet.street};            
             } else {
+                console.log("could not find a pair", results[i]);
                 results[i].pairStreet = {"_id": results[i]._id, "name": results[i].street, "match": false};
             }
+
+            if(results[i].pairStreet._id == results[i]._id)
+                console.log("found self as my own pair", minDistance, pairStreet)
+            // debugger;
         }
 
         for (var i = 0; i < results.length; i++) {
@@ -237,14 +248,14 @@ function slimDataSet(results) {
     for (var i = 0; i < results.length; i++) {
         var thisResult = results[i];
         delete thisResult.type;
-        delete thisResult.streetSlopeAndDirection;
-        delete thisResult.pairStreet;
+        // delete thisResult.streetSlopeAndDirection;
+        // delete thisResult.pairStreet;
         for (var j = 0; j < thisResult.sweepings.length; j++) {
             thisResult.sweepings[j].weekday = thisResult.sweepings[j].datapoint.properties.WEEKDAY;
             thisResult.sweepings[j].from = thisResult.sweepings[j].datapoint.properties.FROMHOUR;
             thisResult.sweepings[j].to = thisResult.sweepings[j].datapoint.properties.TOHOUR;
             
-            delete thisResult.sweepings[j].datapoint;
+            // delete thisResult.sweepings[j].datapoint;
         };
     };
     return results;

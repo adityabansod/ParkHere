@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		FE1B5FCB1A0D97F700904ECB /* PolylineWithAnnotations.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE1B5FCA1A0D97F700904ECB /* PolylineWithAnnotations.swift */; };
+		FE5756EB1A96AB12006DE420 /* SettingsOverlay.xib in Resources */ = {isa = PBXBuildFile; fileRef = FE5756EA1A96AB12006DE420 /* SettingsOverlay.xib */; };
+		FE5756ED1A96AF91006DE420 /* SettingsOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE5756EC1A96AF91006DE420 /* SettingsOverlayView.swift */; };
 		FE6056BE1A6B883600A6D222 /* IntroContentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE6056BD1A6B883600A6D222 /* IntroContentViewController.swift */; };
 		FE6056C01A6B8AA300A6D222 /* IntroViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE6056BF1A6B8AA300A6D222 /* IntroViewController.swift */; };
 		FE6863A01A0BF7FC0055EDE0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE68639F1A0BF7FC0055EDE0 /* AppDelegate.swift */; };
@@ -33,6 +35,8 @@
 
 /* Begin PBXFileReference section */
 		FE1B5FCA1A0D97F700904ECB /* PolylineWithAnnotations.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PolylineWithAnnotations.swift; sourceTree = "<group>"; };
+		FE5756EA1A96AB12006DE420 /* SettingsOverlay.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SettingsOverlay.xib; sourceTree = "<group>"; };
+		FE5756EC1A96AF91006DE420 /* SettingsOverlayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsOverlayView.swift; sourceTree = "<group>"; };
 		FE6056BD1A6B883600A6D222 /* IntroContentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroContentViewController.swift; sourceTree = "<group>"; };
 		FE6056BF1A6B8AA300A6D222 /* IntroViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = IntroViewController.swift; sourceTree = "<group>"; };
 		FE68639A1A0BF7FC0055EDE0 /* Park Here.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Park Here.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -92,6 +96,8 @@
 			isa = PBXGroup;
 			children = (
 				FE6863A11A0BF7FC0055EDE0 /* MapViewController.swift */,
+				FE5756EA1A96AB12006DE420 /* SettingsOverlay.xib */,
+				FE5756EC1A96AF91006DE420 /* SettingsOverlayView.swift */,
 			);
 			name = "Map View";
 			sourceTree = "<group>";
@@ -245,6 +251,7 @@
 				FE6863A51A0BF7FC0055EDE0 /* Main.storyboard in Resources */,
 				FE6863AA1A0BF7FC0055EDE0 /* LaunchScreen.xib in Resources */,
 				FE6863A71A0BF7FC0055EDE0 /* Images.xcassets in Resources */,
+				FE5756EB1A96AB12006DE420 /* SettingsOverlay.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,6 +271,7 @@
 			files = (
 				FEC97D691A88606700214D90 /* Geospatial.swift in Sources */,
 				FE6056C01A6B8AA300A6D222 /* IntroViewController.swift in Sources */,
+				FE5756ED1A96AF91006DE420 /* SettingsOverlayView.swift in Sources */,
 				FE1B5FCB1A0D97F700904ECB /* PolylineWithAnnotations.swift in Sources */,
 				FE6056BE1A6B883600A6D222 /* IntroContentViewController.swift in Sources */,
 				FE6863A21A0BF7FC0055EDE0 /* MapViewController.swift in Sources */,
@@ -369,7 +377,8 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;

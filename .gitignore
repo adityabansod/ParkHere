@@ -47,3 +47,5 @@ xcuserdata
 *.moved-aside
 DerivedData
 *.xcuserstate
+
+*.xcbkptlist

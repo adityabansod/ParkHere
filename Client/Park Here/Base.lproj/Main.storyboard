@@ -196,14 +196,35 @@
                                     <action selector="resetLocation:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="pi4-Os-uYP"/>
                                 </connections>
                             </button>
+                            <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mXD-KP-i85" userLabel="Settings" customClass="SettingsOverlayView" customModule="Park_Here" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="174" width="353" height="300"/>
+                                <subviews>
+                                    <textView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" editable="NO" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iUf-Cy-5dF">
+                                        <rect key="frame" x="56" y="249" width="257" height="51"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="95" id="d0G-Y5-Hb8"/>
+                                        </constraints>
+                                        <string key="text">Parking data provided by the City of San Francisco. 
+Artwork by John Fan. Concept by Cynthia Gomez.
+Copyright 2015 Aditya Bansod.
+</string>
+                                        <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                    </textView>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="mXD-KP-i85" firstAttribute="top" secondItem="BSD-be-Zj1" secondAttribute="bottom" constant="18" id="0XD-Gj-Cqn"/>
                             <constraint firstAttribute="trailing" secondItem="inX-NB-SkW" secondAttribute="trailing" id="1jD-VS-Dog"/>
                             <constraint firstItem="zc2-ws-HFp" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" id="3UN-e0-scT"/>
                             <constraint firstItem="BSD-be-Zj1" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" id="4Gv-Rn-Bm7"/>
+                            <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="mXD-KP-i85" secondAttribute="bottom" constant="126" id="ABF-hb-QkW"/>
                             <constraint firstItem="inX-NB-SkW" firstAttribute="leading" secondItem="BSD-be-Zj1" secondAttribute="leading" id="Hro-gW-pQl"/>
                             <constraint firstItem="inX-NB-SkW" firstAttribute="bottom" secondItem="2fi-mo-0CV" secondAttribute="top" id="J8d-hf-pnG"/>
+                            <constraint firstItem="mXD-KP-i85" firstAttribute="leading" secondItem="BSD-be-Zj1" secondAttribute="leading" id="MxS-7s-fof"/>
                             <constraint firstItem="mEK-iN-feI" firstAttribute="trailing" secondItem="zc2-ws-HFp" secondAttribute="trailing" id="Q7V-8N-eCO"/>
                             <constraint firstItem="BSD-be-Zj1" firstAttribute="top" secondItem="inX-NB-SkW" secondAttribute="top" id="Vp0-3w-fU7"/>
                             <constraint firstItem="BSD-be-Zj1" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="b5v-CD-CGn"/>
@@ -211,6 +232,7 @@
                             <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="mEK-iN-feI" secondAttribute="bottom" constant="8" symbolic="YES" id="k8z-kc-E7z"/>
                             <constraint firstAttribute="centerY" secondItem="fiz-I0-DUQ" secondAttribute="centerY" constant="-10" id="m6t-Ey-9pX"/>
                             <constraint firstItem="zc2-ws-HFp" firstAttribute="centerX" secondItem="BSD-be-Zj1" secondAttribute="centerX" id="n2V-Ne-2GP"/>
+                            <constraint firstAttribute="trailing" secondItem="mXD-KP-i85" secondAttribute="trailing" constant="247" id="psl-xS-LlX"/>
                             <constraint firstAttribute="centerX" secondItem="fiz-I0-DUQ" secondAttribute="centerX" id="qZ1-AI-tZh"/>
                             <constraint firstItem="zc2-ws-HFp" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" constant="54" id="vCV-1H-3cb"/>
                         </constraints>
@@ -245,21 +267,20 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="x0A-0m-gTN">
-                                <rect key="frame" x="546" y="51" width="38" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="x0A-0m-gTN">
+                                <rect key="frame" x="531" y="51" width="53" height="42"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="38" id="Oz8-5b-r6C"/>
+                                    <constraint firstAttribute="width" constant="53" id="qHs-Ph-4QW"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                <state key="normal" title="X">
+                                <state key="normal" image="XIcon">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <action selector="cancelButton:" destination="Bzv-xd-Asy" eventType="touchUpInside" id="3Yw-z5-idJ"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" usesAttributedText="YES" lineBreakMode="wordWrap" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hWl-1L-dvo">
-                                <rect key="frame" x="27" y="89" width="547" height="69"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" usesAttributedText="YES" lineBreakMode="wordWrap" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hWl-1L-dvo">
+                                <rect key="frame" x="27" y="101" width="547" height="69"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="69" id="xpS-V5-irM"/>
                                 </constraints>
@@ -274,8 +295,8 @@
                                 </attributedString>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" image="IntroImage1" translatesAutoresizingMaskIntoConstraints="NO" id="VeJ-zL-Qvs">
-                                <rect key="frame" x="56" y="166" width="489" height="486"/>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="IntroImage1" translatesAutoresizingMaskIntoConstraints="NO" id="VeJ-zL-Qvs">
+                                <rect key="frame" x="56" y="178" width="489" height="486"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="486" id="Zct-Ue-kuE"/>
                                     <constraint firstAttribute="width" constant="323" id="agP-Pg-jWh"/>
@@ -292,13 +313,13 @@
                         <color key="backgroundColor" red="0.9882352941176471" green="1" blue="0.96078431372549022" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="VeJ-zL-Qvs" firstAttribute="top" secondItem="hWl-1L-dvo" secondAttribute="bottom" constant="8" symbolic="YES" id="1C7-Vs-jcJ"/>
-                            <constraint firstItem="x0A-0m-gTN" firstAttribute="trailing" secondItem="eCK-5v-4ev" secondAttribute="trailingMargin" id="A1I-3a-IKT"/>
+                            <constraint firstItem="x0A-0m-gTN" firstAttribute="top" secondItem="WjC-MR-3uT" secondAttribute="bottom" constant="31" id="BoI-xk-o2e"/>
                             <constraint firstItem="VeJ-zL-Qvs" firstAttribute="leading" secondItem="eCK-5v-4ev" secondAttribute="leadingMargin" constant="40" id="CDV-KI-OqE"/>
                             <constraint firstItem="hWl-1L-dvo" firstAttribute="leading" secondItem="eCK-5v-4ev" secondAttribute="leadingMargin" constant="11" id="IIY-9K-P52"/>
                             <constraint firstItem="VeJ-zL-Qvs" firstAttribute="centerX" secondItem="hWl-1L-dvo" secondAttribute="centerX" id="NMB-gp-Ztb"/>
-                            <constraint firstItem="x0A-0m-gTN" firstAttribute="top" secondItem="WjC-MR-3uT" secondAttribute="bottom" constant="31" id="jdS-zM-jYk"/>
+                            <constraint firstItem="x0A-0m-gTN" firstAttribute="trailing" secondItem="eCK-5v-4ev" secondAttribute="trailingMargin" id="i9L-QI-Kwr"/>
                             <constraint firstItem="VeJ-zL-Qvs" firstAttribute="centerX" secondItem="hWl-1L-dvo" secondAttribute="centerX" id="mqN-z7-ai2"/>
-                            <constraint firstItem="hWl-1L-dvo" firstAttribute="top" secondItem="x0A-0m-gTN" secondAttribute="bottom" constant="8" symbolic="YES" id="oWS-0X-ViC"/>
+                            <constraint firstItem="hWl-1L-dvo" firstAttribute="top" secondItem="x0A-0m-gTN" secondAttribute="bottom" constant="8" symbolic="YES" id="nXt-rp-D4D"/>
                             <constraint firstItem="hWl-1L-dvo" firstAttribute="centerX" secondItem="eCK-5v-4ev" secondAttribute="centerX" id="wtU-gA-XwF"/>
                         </constraints>
                         <variation key="default">
@@ -319,5 +340,6 @@
     <resources>
         <image name="IntroImage1" width="213" height="320"/>
         <image name="LocationArrow" width="170" height="170"/>
+        <image name="XIcon" width="42" height="42"/>
     </resources>
 </document>

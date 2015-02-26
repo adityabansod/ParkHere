@@ -72,7 +72,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
             return
         }
         
-//        let url = NSURL(string: "http://192.168.1.186:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
+//        let url = NSURL(string: "http://localhost:5000/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
         let url = NSURL(string: "https://parkhereapp.herokuapp.com/nearby/\(coordinate.latitude)/\(coordinate.longitude)?maxDistance=\(maxDistance)")
         
         println("starting network request")
@@ -356,7 +356,9 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
             case thursdayLabel: whichLabel = thursdayLabel
             case fridayLabel: whichLabel = fridayLabel
             case saturdayLabel: whichLabel = saturdayLabel
-            default: return
+            default:
+                resetCalendarOverlay(true)
+                return
         }
         
         createAlert("something", message: selectedPolyline!.rulesForDay(whichLabel.text!))
@@ -410,19 +412,13 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
             
             var polylineRenderer = MKPolylineRenderer(overlay: poly)
             poly.renderer = polylineRenderer
-            if poly.hasSweepingsToday {
+            if poly.hasRestrictionsInNext24Hours {
                 polylineRenderer.strokeColor = UIColor.yellowColor().colorWithAlphaComponent(0.65)
-            } else if poly.hasSweepingsToday && poly.hasAnyRestrictions {
-                polylineRenderer.strokeColor = UIColor.redColor().colorWithAlphaComponent(0.5)
-            } else if poly.hasSomeRestrictions {
-                polylineRenderer.strokeColor = UIColor.greenColor().colorWithAlphaComponent(0.5)
             } else {
-                polylineRenderer.strokeColor = UIColor.blueColor().colorWithAlphaComponent(0.8)
+                polylineRenderer.strokeColor = UIColor.blueColor().colorWithAlphaComponent(0.5)
             }
             
             polylineRenderer.lineWidth = 4
-            polylineRenderer.lineCap = kCGLineCapSquare
-            polylineRenderer.lineDashPhase = 15
             return polylineRenderer
         } else {
             return nil
