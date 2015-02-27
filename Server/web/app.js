@@ -36,5 +36,9 @@ app.get('/nearby/:lat/:lon', function(req, res) {
 app.get('/settings', function(req, res) {
     res.send(settings());
 });
+app.get('/heartbeat', function(req, res) {
+    res.send('OK');
+});
+
 app.listen(port);
 console.log('Listening on port ' + port + '...');
