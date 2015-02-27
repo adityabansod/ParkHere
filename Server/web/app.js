@@ -1,3 +1,5 @@
+require('newrelic');
+
 var express = require('express'),
     geodata = require('./geodata.js'),
     geo2 = require('./geo2.js'),
