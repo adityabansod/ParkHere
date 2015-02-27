@@ -28,6 +28,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     var selectedPolyline:PolylineWithAnnotations?
     var selectedPolylineOldColor:UIColor?
     @IBOutlet weak var loadingIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var alertOverlay: UIView!
+    @IBOutlet weak var alertOverlayLabel: UILabel!
     
 
     override func viewDidLoad() {
@@ -277,6 +279,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         var handler:(Void) -> ()
         handler = {
             self.opacityUnderlay.alpha = 0.0
+            self.opacityUnderlay.hidden = true
             self.opacityUnderlay.frame.origin.y = -self.opacityUnderlay.frame.height
             
             self.streetNameLabel.hidden = true
@@ -301,7 +304,9 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     
     func updateCalendarOverlay(polyline: PolylineWithAnnotations) {
         resetCalendarOverlay(false)
-
+        updateAlertOverlay("", show: false)
+        
+        opacityUnderlay.hidden = false
         UIView.animateWithDuration(0.5, delay: 0.0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1.0, options: nil, animations: {
             self.opacityUnderlay.frame.origin.y = 20
             self.streetNameLabel.frame.origin.y = 77
@@ -358,10 +363,12 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
             case saturdayLabel: whichLabel = saturdayLabel
             default:
                 resetCalendarOverlay(true)
+                updateAlertOverlay("", show: false)
                 return
         }
         
-        createAlert("something", message: selectedPolyline!.rulesForDay(whichLabel.text!))
+        updateAlertOverlay(selectedPolyline!.rulesForDay(whichLabel.text!), show: true)
+//        createAlert("something", message: )
         
 //        println(whichLabel)
     }
@@ -377,8 +384,22 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         self.presentViewController(alert, animated: true, completion: nil)
     }
     
+    func updateAlertOverlay(message: String, show: Bool) {
+        dispatch_async(dispatch_get_main_queue()) {
+            self.alertOverlayLabel.text = message
+            UIView.animateWithDuration(0.1, animations: {
+                self.alertOverlay.hidden = !show
+                if show {
+                    self.alertOverlay.alpha = 0.9
+                } else {
+                    self.alertOverlay.alpha = 0.0
+                }
+            })
+            
+        }
+    }
+    
     @IBAction func resetLocation(sender: UIButton) {
-        mapView.userLocation.coordinate
         
         mapView.setRegion(MKCoordinateRegionMake(mapView.userLocation.coordinate, MKCoordinateSpanMake(0.0005, 0.0005)), animated: true)
         
@@ -387,6 +408,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     // MARK: MapView Handling
     func mapView(mapView: MKMapView!, regionWillChangeAnimated animated: Bool) {
         dispatch_async(dispatch_get_main_queue()) {
+            self.updateAlertOverlay("", show: false)
             self.resetCalendarOverlay(true)
         }
     }
@@ -395,14 +417,19 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         dispatch_async(dispatch_get_main_queue()) {
             self.resetCalendarOverlay(true)
         }
-        let maxDistance = Geospatial.findMaxDimensionsOfMap(mapView)
-        if(maxDistance < 1000) {
-            // TODO MOVE THIS TO A DIFFERNET LABEL
-            streetNameLabel.hidden = true
-            lookupSweepingForLocation(mapView.centerCoordinate, maxDistance: maxDistance)
+        
+        let center = mapView.centerCoordinate
+        
+        if Geospatial.coordinateInsideSupportedBoundingBox(center) {
+            let maxDistance = Geospatial.findMaxDimensionsOfMap(mapView)
+            if(maxDistance < 1000) {
+                updateAlertOverlay("", show: false)
+                lookupSweepingForLocation(center, maxDistance: maxDistance)
+            } else {
+                updateAlertOverlay("Zoom in to load parking information", show: true)
+            }
         } else {
-            streetNameLabel.hidden = false
-            streetNameLabel.text = "Zoom in to loading parking information."
+            updateAlertOverlay("ParkHere currently supports San Francisco", show: true)
         }
     }
     
