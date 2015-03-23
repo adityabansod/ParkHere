@@ -2,7 +2,8 @@
   "images" : [
     {
       "idiom" : "universal",
-      "scale" : "1x"
+      "scale" : "1x",
+      "filename" : "1361911345452-Path.png"
     },
     {
       "idiom" : "universal",
@@ -10,8 +11,7 @@
     },
     {
       "idiom" : "universal",
-      "scale" : "3x",
-      "filename" : "1361911345452-Path.png"
+      "scale" : "3x"
     }
   ],
   "info" : {

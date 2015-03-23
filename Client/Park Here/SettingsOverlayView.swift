@@ -31,6 +31,6 @@ class SettingsOverlayView: UIView {
     }
     
     private func loadNib() -> SettingsOverlayView {
-        return NSBundle.mainBundle().loadNibNamed("SettingsOverlay", owner: nil, options: nil)[0] as SettingsOverlayView
+        return NSBundle.mainBundle().loadNibNamed("SettingsOverlay", owner: self, options: nil)[0] as SettingsOverlayView
     }
 }

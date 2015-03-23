@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14C109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="Kkh-KA-mAI">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6751" systemVersion="14C1514" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="Kkh-KA-mAI">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6736"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
@@ -65,31 +65,31 @@
                                     <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Sat" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jZq-el-Gyl">
                                         <rect key="frame" x="544" y="17" width="34" height="21"/>
                                         <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
-                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Fri" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Dyy-rE-ICn">
                                         <rect key="frame" x="442" y="17" width="24" height="21"/>
                                         <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
-                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Thu" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="g8s-g1-1NB">
                                         <rect key="frame" x="345" y="17" width="62" height="20"/>
                                         <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
-                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Wed" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wPO-wG-Tqg">
                                         <rect key="frame" x="260" y="17" width="63" height="21"/>
                                         <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
-                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Mon" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VRO-rd-1Gy">
                                         <rect key="frame" x="109" y="17" width="37" height="21"/>
                                         <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
-                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <view alpha="0.0" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YtE-z4-AJ8">
@@ -119,13 +119,13 @@
                                     <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Tue" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZD3-en-pXo">
                                         <rect key="frame" x="184" y="17" width="62" height="21"/>
                                         <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
-                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Sun" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="suL-nr-cZf">
                                         <rect key="frame" x="31" y="17" width="36" height="21"/>
                                         <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="17"/>
-                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                 </subviews>
@@ -170,7 +170,7 @@
                                     <constraint firstAttribute="height" constant="69" id="Qk6-Cw-SsM"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="18"/>
-                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                                 <variation key="heightClass=compact-widthClass=compact" misplaced="YES">
                                     <rect key="frame" x="16" y="323" width="88" height="69"/>
@@ -182,7 +182,7 @@
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ParkHere works in San Francisco only. " textAlignment="center" lineBreakMode="wordWrap" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kNu-hY-p43" userLabel="Alert Label">
                                         <rect key="frame" x="0.0" y="0.0" width="300" height="55"/>
                                         <fontDescription key="fontDescription" name="HelveticaNeue-Light" family="Helvetica Neue" pointSize="16"/>
-                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                 </subviews>
@@ -197,13 +197,10 @@
                                 </constraints>
                             </view>
                             <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mXD-KP-i85" userLabel="Settings" customClass="SettingsOverlayView" customModule="Park_Here" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="174" width="353" height="300"/>
+                                <rect key="frame" x="0.0" y="174" width="200" height="300"/>
                                 <subviews>
-                                    <textView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" ambiguous="YES" misplaced="YES" editable="NO" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iUf-Cy-5dF">
-                                        <rect key="frame" x="56" y="249" width="257" height="51"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="95" id="d0G-Y5-Hb8"/>
-                                        </constraints>
+                                    <textView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" editable="NO" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iUf-Cy-5dF" userLabel="Credits">
+                                        <rect key="frame" x="8" y="241" width="257" height="51"/>
                                         <string key="text">Parking data provided by the City of San Francisco. 
 Artwork by John Fan. Concept by Cynthia Gomez.
 Copyright 2015 Aditya Bansod.
@@ -211,8 +208,23 @@ Copyright 2015 Aditya Bansod.
                                         <fontDescription key="fontDescription" type="system" pointSize="10"/>
                                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                     </textView>
+                                    <pickerView contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WkF-qp-PAH">
+                                        <rect key="frame" x="-60" y="36" width="320" height="216"/>
+                                    </pickerView>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Day of Week Coloring" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TwW-jf-8DZ">
+                                        <rect key="frame" x="14" y="22" width="101" height="21"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="slV-wG-XZ7">
+                                        <rect key="frame" x="137" y="17" width="51" height="31"/>
+                                    </switch>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="200" id="XaL-Nl-cu7"/>
+                                </constraints>
                             </view>
                             <button opaque="NO" alpha="0.90000000000000002" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mEK-iN-feI">
                                 <rect key="frame" x="568" y="576" width="16" height="16"/>
@@ -230,24 +242,23 @@ Copyright 2015 Aditya Bansod.
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="mXD-KP-i85" firstAttribute="top" secondItem="BSD-be-Zj1" secondAttribute="bottom" constant="18" id="0XD-Gj-Cqn"/>
                             <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="g8n-ur-ZJ0" secondAttribute="bottom" id="1Yi-pm-8Yb"/>
                             <constraint firstAttribute="trailing" secondItem="inX-NB-SkW" secondAttribute="trailing" id="1jD-VS-Dog"/>
                             <constraint firstItem="zc2-ws-HFp" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" id="3UN-e0-scT"/>
                             <constraint firstItem="BSD-be-Zj1" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" id="4Gv-Rn-Bm7"/>
                             <constraint firstItem="g8n-ur-ZJ0" firstAttribute="centerX" secondItem="inX-NB-SkW" secondAttribute="centerX" id="8Ba-gG-R3U"/>
-                            <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="mXD-KP-i85" secondAttribute="bottom" constant="126" id="ABF-hb-QkW"/>
+                            <constraint firstItem="mXD-KP-i85" firstAttribute="top" secondItem="BSD-be-Zj1" secondAttribute="bottom" constant="18" id="AUS-3x-khR"/>
                             <constraint firstItem="inX-NB-SkW" firstAttribute="leading" secondItem="BSD-be-Zj1" secondAttribute="leading" id="Hro-gW-pQl"/>
                             <constraint firstItem="inX-NB-SkW" firstAttribute="bottom" secondItem="2fi-mo-0CV" secondAttribute="top" id="J8d-hf-pnG"/>
-                            <constraint firstItem="mXD-KP-i85" firstAttribute="leading" secondItem="BSD-be-Zj1" secondAttribute="leading" id="MxS-7s-fof"/>
                             <constraint firstItem="mEK-iN-feI" firstAttribute="trailing" secondItem="zc2-ws-HFp" secondAttribute="trailing" id="Q7V-8N-eCO"/>
                             <constraint firstItem="BSD-be-Zj1" firstAttribute="top" secondItem="inX-NB-SkW" secondAttribute="top" id="Vp0-3w-fU7"/>
                             <constraint firstItem="BSD-be-Zj1" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leading" id="b5v-CD-CGn"/>
                             <constraint firstItem="inX-NB-SkW" firstAttribute="trailing" secondItem="BSD-be-Zj1" secondAttribute="trailing" id="c0I-aD-IIb"/>
+                            <constraint firstAttribute="centerY" secondItem="mXD-KP-i85" secondAttribute="centerY" constant="-24" id="cd6-91-KC9"/>
+                            <constraint firstItem="mXD-KP-i85" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" constant="-16" id="iS5-w0-6Tt"/>
                             <constraint firstItem="2fi-mo-0CV" firstAttribute="top" secondItem="mEK-iN-feI" secondAttribute="bottom" constant="8" symbolic="YES" id="k8z-kc-E7z"/>
                             <constraint firstAttribute="centerY" secondItem="fiz-I0-DUQ" secondAttribute="centerY" constant="-10" id="m6t-Ey-9pX"/>
                             <constraint firstItem="zc2-ws-HFp" firstAttribute="centerX" secondItem="BSD-be-Zj1" secondAttribute="centerX" id="n2V-Ne-2GP"/>
-                            <constraint firstAttribute="trailing" secondItem="mXD-KP-i85" secondAttribute="trailing" constant="247" id="psl-xS-LlX"/>
                             <constraint firstAttribute="centerX" secondItem="fiz-I0-DUQ" secondAttribute="centerX" id="qZ1-AI-tZh"/>
                             <constraint firstItem="zc2-ws-HFp" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" constant="54" id="vCV-1H-3cb"/>
                         </constraints>
@@ -285,9 +296,10 @@ Copyright 2015 Aditya Bansod.
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="x0A-0m-gTN">
-                                <rect key="frame" x="531" y="51" width="53" height="42"/>
+                                <rect key="frame" x="531" y="51" width="18" height="18"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="53" id="qHs-Ph-4QW"/>
+                                    <constraint firstAttribute="height" constant="18" id="U41-Jb-kmK"/>
+                                    <constraint firstAttribute="width" constant="18" id="bgH-d5-sin"/>
                                 </constraints>
                                 <state key="normal" image="XIcon">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -304,7 +316,7 @@ Copyright 2015 Aditya Bansod.
                                 <attributedString key="attributedText">
                                     <fragment content="Title Text">
                                         <attributes>
-                                            <color key="NSColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                             <font key="NSFont" size="17" name="HelveticaNeue"/>
                                             <paragraphStyle key="NSParagraphStyle" alignment="center" lineBreakMode="wordWrapping" baseWritingDirection="natural"/>
                                         </attributes>
@@ -312,8 +324,8 @@ Copyright 2015 Aditya Bansod.
                                 </attributedString>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="IntroImage1" translatesAutoresizingMaskIntoConstraints="NO" id="VeJ-zL-Qvs">
-                                <rect key="frame" x="56" y="178" width="489" height="486"/>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" image="IntroImage1" translatesAutoresizingMaskIntoConstraints="NO" id="VeJ-zL-Qvs">
+                                <rect key="frame" x="56" y="178" width="326" height="489"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="486" id="Zct-Ue-kuE"/>
                                     <constraint firstAttribute="width" constant="323" id="agP-Pg-jWh"/>
@@ -330,14 +342,14 @@ Copyright 2015 Aditya Bansod.
                         <color key="backgroundColor" red="0.9882352941176471" green="1" blue="0.96078431372549022" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="VeJ-zL-Qvs" firstAttribute="top" secondItem="hWl-1L-dvo" secondAttribute="bottom" constant="8" symbolic="YES" id="1C7-Vs-jcJ"/>
-                            <constraint firstItem="x0A-0m-gTN" firstAttribute="top" secondItem="WjC-MR-3uT" secondAttribute="bottom" constant="31" id="BoI-xk-o2e"/>
                             <constraint firstItem="VeJ-zL-Qvs" firstAttribute="leading" secondItem="eCK-5v-4ev" secondAttribute="leadingMargin" constant="40" id="CDV-KI-OqE"/>
                             <constraint firstItem="hWl-1L-dvo" firstAttribute="leading" secondItem="eCK-5v-4ev" secondAttribute="leadingMargin" constant="11" id="IIY-9K-P52"/>
                             <constraint firstItem="VeJ-zL-Qvs" firstAttribute="centerX" secondItem="hWl-1L-dvo" secondAttribute="centerX" id="NMB-gp-Ztb"/>
-                            <constraint firstItem="x0A-0m-gTN" firstAttribute="trailing" secondItem="eCK-5v-4ev" secondAttribute="trailingMargin" id="i9L-QI-Kwr"/>
+                            <constraint firstItem="x0A-0m-gTN" firstAttribute="top" secondItem="WjC-MR-3uT" secondAttribute="bottom" constant="31" id="X6S-Bv-OL9"/>
+                            <constraint firstItem="hWl-1L-dvo" firstAttribute="top" secondItem="x0A-0m-gTN" secondAttribute="bottom" constant="32" id="lut-2U-hGU"/>
                             <constraint firstItem="VeJ-zL-Qvs" firstAttribute="centerX" secondItem="hWl-1L-dvo" secondAttribute="centerX" id="mqN-z7-ai2"/>
-                            <constraint firstItem="hWl-1L-dvo" firstAttribute="top" secondItem="x0A-0m-gTN" secondAttribute="bottom" constant="8" symbolic="YES" id="nXt-rp-D4D"/>
                             <constraint firstItem="hWl-1L-dvo" firstAttribute="centerX" secondItem="eCK-5v-4ev" secondAttribute="centerX" id="wtU-gA-XwF"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="x0A-0m-gTN" secondAttribute="trailing" constant="35" id="ypK-1N-p9k"/>
                         </constraints>
                         <variation key="default">
                             <mask key="constraints">
@@ -355,7 +367,7 @@ Copyright 2015 Aditya Bansod.
         </scene>
     </scenes>
     <resources>
-        <image name="IntroImage1" width="213" height="320"/>
+        <image name="IntroImage1" width="326" height="489"/>
         <image name="LocationArrow" width="170" height="170"/>
         <image name="XIcon" width="42" height="42"/>
     </resources>
